@@ -1,0 +1,1538 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Draw practice spreads and drill Thoth and Rider–Waite–Smith correspondences.">
+<meta name="theme-color" content="#ECEEF4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121120" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tarot Drill">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+.install-btn{margin-left:10px;border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:999px;padding:2px 12px;font:inherit;font-size:.8rem;cursor:pointer;vertical-align:1px}
+</style>
+<title>Tarot Correspondence Drill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Symbols+2&display=swap">
+<style>
+/* Layout: title and tabs, a slim deck bar shared by every tab (folds away on phones), then the full-width working area. */
+:root{
+  --bg:#ECEEF4; --surface:#F9FAFD; --sunk:#E2E4EE; --ink:#1C1937; --muted:#5D5A79; --line:#CFD1E0;
+  --accent:#3E2F9E; --accent-ink:#FFFFFF; --gilt:#9A6B0F;
+  --fire:#BF3F2B; --water:#2462A6; --air:#A7820A; --earth:#3C7A38; --spirit:#6A5AA6; --neutral:#9C9AB4;
+  --ok:#2C7A4C; --ok-bg:#DDF0E3; --bad:#B0352A; --bad-bg:#F7E0DD;
+  --f-display:"Marcellus", "Cormorant Garamond", Georgia, serif;
+  --f-body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --f-glyph:"Noto Sans Symbols 2", "Segoe UI Symbol", "Apple Symbols", sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121120; --surface:#1B1A2C; --sunk:#242338; --ink:#E9E7F6; --muted:#A3A0BF; --line:#33314C;
+  --accent:#A99CFF; --accent-ink:#16132E; --gilt:#E0B44C;
+  --fire:#F0806A; --water:#6FA9EA; --air:#E2C14E; --earth:#7EBB73; --spirit:#B3A6F0; --neutral:#6E6C88;
+  --ok:#73CF95; --ok-bg:#1C3326; --bad:#F2907F; --bad-bg:#3A2020; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#121120; --surface:#1B1A2C; --sunk:#242338; --ink:#E9E7F6; --muted:#A3A0BF; --line:#33314C;
+  --accent:#A99CFF; --accent-ink:#16132E; --gilt:#E0B44C;
+  --fire:#F0806A; --water:#6FA9EA; --air:#E2C14E; --earth:#7EBB73; --spirit:#B3A6F0; --neutral:#6E6C88;
+  --ok:#73CF95; --ok-bg:#1C3326; --bad:#F2907F; --bad-bg:#3A2020; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;padding:0 16px 48px}
+.wrap{max-width:1240px;margin:0 auto}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.g{font-family:var(--f-glyph);font-weight:400;margin-right:.18em}
+.heb{font-family:"Noto Sans Hebrew","Arial Hebrew","David",serif;margin-right:.25em}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:22px 18px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,3.4vw,2.2rem);line-height:1.1;margin:0;letter-spacing:.01em;text-wrap:balance}
+h2.sec{font-family:var(--f-display);font-weight:400;font-size:1.25rem;margin:0 0 10px}
+.sub{color:var(--muted);font-size:.85rem;margin:4px 0 0}
+nav.tabs{display:flex;gap:4px;background:var(--sunk);padding:4px;border-radius:10px;overflow-x:auto;scrollbar-width:none;max-width:100%}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{flex:0 0 auto;border:0;background:transparent;padding:7px 14px;border-radius:7px;cursor:pointer;color:var(--muted);font-weight:700;font-size:.9rem;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0 / .12)}
+
+.ts{display:none}
+details.deckbar{margin-bottom:22px}
+details.deckbar > summary{display:none}
+.deck-inner{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-start;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.deck-inner .grow{flex:1 1 380px}
+.deck-chips{display:flex;flex-wrap:wrap;gap:6px 16px}
+.deck-chips .chips{gap:6px}
+.lbl .pool{text-transform:none;letter-spacing:0;font-weight:400;margin-left:6px}
+.spreadpick{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sumtxt{font-weight:400;margin-right:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.group{display:flex;flex-direction:column;gap:8px;min-width:0}
+.lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{position:relative;display:inline-flex}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-block;padding:4px 11px;border:1px solid var(--line);border-radius:999px;font-size:.85rem;background:var(--surface);color:var(--muted);cursor:pointer;user-select:none}
+.chip input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chip input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:inline-flex;background:var(--sunk);border-radius:8px;padding:3px;gap:2px;flex-wrap:wrap;max-width:100%}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.seg span{display:block;padding:4px 11px;border-radius:6px;font-size:.85rem;color:var(--muted);cursor:pointer}
+.seg input:checked + span{background:var(--surface);color:var(--ink);font-weight:700;box-shadow:0 1px 2px rgb(0 0 0 / .12)}
+.seg input:focus-visible + span{outline:2px solid var(--accent)}
+.presets{display:flex;flex-wrap:wrap;gap:4px 10px}
+.link{border:0;background:none;padding:0;color:var(--accent);cursor:pointer;font-size:.82rem;text-decoration:underline;text-underline-offset:3px}
+.pool{font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+.pool b{color:var(--ink);font-weight:500}
+select{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 16px;cursor:pointer;font-weight:700;font-size:.9rem}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.quiet{font-weight:400;color:var(--muted)}
+.btn:disabled{opacity:.5;cursor:default}
+.toolbar{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:flex-end;margin-bottom:18px}
+.toolbar .actions{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
+.num-in{width:64px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-family:var(--f-mono)}
+.note{color:var(--muted);font-size:.85rem;margin:0 0 12px;max-width:70ch}
+.hint{font-size:.78rem;color:var(--muted)}
+
+/* spread */
+.spread{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:14px}
+.tcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.tcard .band{height:6px;background:var(--neutral)}
+.el-fire .band{background:var(--fire)} .el-water .band{background:var(--water)}
+.el-air .band{background:var(--air)} .el-earth .band{background:var(--earth)} .el-spirit .band{background:var(--spirit)}
+.tc-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px}
+.tc-top{display:flex;justify-content:space-between;align-items:center;font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
+.rev{color:var(--gilt);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+.tc-name{font-family:var(--f-display);font-weight:400;font-size:1.25rem;line-height:1.2;margin:0;text-wrap:balance}
+.tc-alt{display:block;font-family:var(--f-body);font-size:.78rem;color:var(--muted);margin-top:2px}
+dl.facts{margin:0;display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);gap:4px 10px;font-size:.85rem}
+dl.facts dt{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;padding-top:2px}
+dl.facts dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.mask{border:1px dashed var(--line);background:var(--sunk);border-radius:5px;padding:1px 8px;font-size:.78rem;color:var(--muted);cursor:pointer;width:100%;text-align:left;white-space:nowrap}
+.mask:hover{border-color:var(--accent);color:var(--ink)}
+.mask.big{font-family:var(--f-display);font-size:1.05rem;padding:6px 10px}
+.shown-late{color:var(--accent)}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:28px;text-align:center;color:var(--muted)}
+
+/* quiz */
+.modebar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin-bottom:14px}
+details.qopts{margin-bottom:16px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+details.qopts > summary{cursor:pointer;padding:10px 14px;font-weight:700;font-size:.9rem;list-style:none;display:flex;justify-content:space-between;gap:10px}
+details.qopts > summary::-webkit-details-marker{display:none}
+details.qopts > summary::after{content:"Show";font-weight:400;color:var(--accent);font-size:.85rem}
+details.qopts[open] > summary::after{content:"Hide"}
+.qset{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px 22px;padding:4px 14px 16px}
+.score{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.8rem;color:var(--muted);margin-bottom:12px}
+.pill{display:inline-flex;align-items:baseline;gap:5px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 11px;white-space:nowrap}
+.pill b{font-family:var(--f-mono);font-size:.95rem;color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+.pill.hot{border-color:var(--gilt)} .pill.hot b{color:var(--gilt)}
+.qcard{background:var(--surface);border:1px solid var(--line);border-top:6px solid var(--line);border-radius:14px;padding:20px clamp(16px,3vw,30px) 24px;display:flex;flex-direction:column;gap:16px;transition:border-top-color .35s}
+.qcard.el-fire{border-top-color:var(--fire)}.qcard.el-water{border-top-color:var(--water)}.qcard.el-air{border-top-color:var(--air)}.qcard.el-earth{border-top-color:var(--earth)}.qcard.el-spirit{border-top-color:var(--spirit)}
+.why.el-fire{border-left:4px solid var(--fire)}.why.el-water{border-left:4px solid var(--water)}.why.el-air{border-left:4px solid var(--air)}.why.el-earth{border-left:4px solid var(--earth)}.why.el-spirit{border-left:4px solid var(--spirit)}
+.elname{font-weight:700}.elname.fire{color:var(--fire)}.elname.water{color:var(--water)}.elname.air{color:var(--air)}.elname.earth{color:var(--earth)}
+.q-eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:700;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.q-eyebrow .box{font-family:var(--f-mono);letter-spacing:.04em;text-transform:none;font-weight:400}
+.q-prompt{font-family:var(--f-display);font-size:clamp(1.3rem,2.6vw,1.75rem);line-height:1.25;margin:0;text-wrap:balance}
+.q-prompt strong{font-weight:400;color:var(--accent)}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:11px 14px;cursor:pointer;font-size:.95rem;min-width:0}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt .k{font-family:var(--f-mono);font-size:.75rem;color:var(--muted);padding-top:2px}
+.opt.right{background:var(--ok-bg);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.typed{display:flex;gap:8px;flex-wrap:wrap}
+.typed input{flex:1 1 220px;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 12px}
+.fb{font-size:.95rem;min-height:1.5em}
+.fb.ok{color:var(--ok)} .fb.no{color:var(--bad)}
+.why{background:var(--sunk);border-radius:10px;padding:12px 14px;font-size:.9rem;line-height:1.55}
+.why b{font-weight:700}
+.hintbox{border-left:3px solid var(--gilt);padding:6px 12px;font-size:.9rem;color:var(--ink);background:var(--bg);border-radius:0 8px 8px 0}
+.q-foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.q-foot .acts{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.timer{font-family:var(--f-mono);font-size:2rem;font-variant-numeric:tabular-nums;color:var(--ink)}
+.timer.low{color:var(--bad)}
+.bar{height:6px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+.summary{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.big-num{font-family:var(--f-display);font-size:3rem;line-height:1}
+.missed{margin-top:22px}
+.missed ul{list-style:none;padding:0;margin:0 0 10px;display:flex;flex-wrap:wrap;gap:6px}
+.missed li{font-size:.8rem;border:1px solid var(--line);border-radius:6px;padding:2px 8px;background:var(--surface)}
+.missed li span{color:var(--muted)}
+
+/* maps */
+.maps{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:22px;align-items:start}
+@media (max-width:1000px){.maps{grid-template-columns:minmax(0,1fr)}}
+.mapbox{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px}
+.mapbox svg{display:block;width:100%;height:auto;max-width:640px;max-height:max(400px, calc(100vh - 330px));margin:0 auto;touch-action:manipulation}
+.side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.infocard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.infocard h3{font-family:var(--f-display);font-weight:400;font-size:1.3rem;margin:0}
+.cardchips{display:flex;flex-wrap:wrap;gap:6px}
+.cardchips button{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:3px 9px;font-size:.82rem;cursor:pointer}
+.cardchips button.on{border-color:var(--accent);color:var(--accent)}
+svg text{font-family:var(--f-body);fill:var(--ink);pointer-events:none}
+svg .gl{font-family:var(--f-glyph)}
+svg .hebg{font-family:"Noto Sans Hebrew","Arial Hebrew",serif}
+svg .sm{fill:var(--muted)}
+.sg{stroke:var(--line);stroke-width:1;cursor:pointer}
+.sg.fire{fill:color-mix(in srgb,var(--fire) 16%,var(--surface))}
+.sg.water{fill:color-mix(in srgb,var(--water) 16%,var(--surface))}
+.sg.air{fill:color-mix(in srgb,var(--air) 18%,var(--surface))}
+.sg.earth{fill:color-mix(in srgb,var(--earth) 16%,var(--surface))}
+.dc{fill:var(--surface);stroke:var(--line);stroke-width:1;cursor:pointer}
+.dc:hover,.sg:hover{stroke:var(--accent)}
+.dc.hl{fill:color-mix(in srgb,var(--accent) 22%,var(--surface))}
+.dc.sel{fill:color-mix(in srgb,var(--accent) 45%,var(--surface))}
+.dc.ok{fill:var(--ok-bg);stroke:var(--ok)}
+.dc.bad{fill:var(--bad-bg);stroke:var(--bad)}
+.hub{fill:var(--bg);stroke:var(--line)}
+.span-arc{fill:var(--gilt);opacity:.85}
+.tpath{stroke:var(--line);stroke-width:5;stroke-linecap:round}
+.tpath.hl{stroke:var(--accent)} .tpath.ok{stroke:var(--ok)} .tpath.bad{stroke:var(--bad)}
+.thit{stroke:transparent;stroke-width:20;cursor:pointer}
+.badge{fill:var(--surface);stroke:var(--line);stroke-width:1.2;cursor:pointer}
+.badge.hl{stroke:var(--accent);stroke-width:2.2} .badge.ok{fill:var(--ok-bg);stroke:var(--ok)} .badge.bad{fill:var(--bad-bg);stroke:var(--bad)}
+.seph{fill:var(--surface);stroke:var(--ink);stroke-width:1.4;cursor:pointer}
+.seph:hover{stroke:var(--accent)}
+.seph.hl{fill:color-mix(in srgb,var(--accent) 22%,var(--surface));stroke:var(--accent)}
+.seph.ok{fill:var(--ok-bg);stroke:var(--ok)} .seph.bad{fill:var(--bad-bg);stroke:var(--bad)}
+
+/* match */
+.matchgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.matchcol{display:flex;flex-direction:column;gap:8px;min-width:0}
+.tile{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:12px;text-align:left;cursor:pointer;min-height:52px;font-size:.92rem;overflow-wrap:anywhere}
+.tile.name{font-family:var(--f-display);font-size:1.02rem}
+.tile.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.tile.done{cursor:default;display:flex;gap:10px;align-items:flex-start;color:var(--ink)}
+.tile .pn{flex:0 0 auto;font-family:var(--f-mono);font-size:.75rem;font-weight:500;min-width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;color:var(--accent-ink)}
+.tile.p0{background:color-mix(in srgb,var(--fire) 14%,var(--surface));border-color:var(--fire)} .tile.p0 .pn{background:var(--fire)}
+.tile.p1{background:color-mix(in srgb,var(--water) 14%,var(--surface));border-color:var(--water)} .tile.p1 .pn{background:var(--water)}
+.tile.p2{background:color-mix(in srgb,var(--air) 16%,var(--surface));border-color:var(--air)} .tile.p2 .pn{background:var(--air)}
+.tile.p3{background:color-mix(in srgb,var(--earth) 14%,var(--surface));border-color:var(--earth)} .tile.p3 .pn{background:var(--earth)}
+.tile.p4{background:color-mix(in srgb,var(--spirit) 14%,var(--surface));border-color:var(--spirit)} .tile.p4 .pn{background:var(--spirit)}
+.tile.p5{background:color-mix(in srgb,var(--gilt) 14%,var(--surface));border-color:var(--gilt)} .tile.p5 .pn{background:var(--gilt)}
+.tile.miss{background:var(--bad-bg);border-color:var(--bad)}
+
+/* progress */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:22px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.8rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.stages{display:flex;flex-direction:column;gap:12px;margin-bottom:26px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stage .t{font-weight:700}
+.stage .d{font-size:.8rem;color:var(--muted)}
+.stage .bar{grid-column:1 / -1}
+.stage .pct{font-family:var(--f-mono);font-size:.85rem;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--muted);margin-bottom:10px;align-items:center}
+.legend i{display:inline-block;width:14px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-2px;border:1px solid transparent}
+.legend i.lv0{border:1.5px dashed color-mix(in srgb,var(--muted) 55%,transparent)}
+.mapwrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table.mm{border-collapse:collapse;font-size:.8rem;width:auto;min-width:100%}
+table.mm th{position:sticky;top:0;background:var(--sunk);font-size:.64rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:6px 4px;text-align:center}
+table.mm th:first-child{text-align:left;padding-left:12px}
+table.mm td{padding:3px 4px;text-align:center;border-bottom:1px solid var(--line)}
+table.mm td.nm{text-align:left;padding-left:12px;white-space:nowrap;font-family:var(--f-display);font-size:.9rem}
+table.mm tr.grp td{background:var(--bg);font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);text-align:left;padding:8px 12px;font-family:var(--f-body)}
+table.mm tr.grp td .gsum{text-transform:none;letter-spacing:0;margin-left:8px;font-family:var(--f-mono)}
+table.mm tr.grp td .dot{vertical-align:0}
+.cell{display:inline-block;width:24px;height:20px;border-radius:4px;border:1.5px dashed color-mix(in srgb,var(--muted) 55%,transparent);vertical-align:middle;cursor:pointer;padding:0;background:transparent}
+.cell:hover{border-color:var(--accent)}
+.lv0{background:transparent}
+.lv1{background:color-mix(in srgb,var(--bad) 55%,var(--surface));border-color:transparent}
+.lv2{background:color-mix(in srgb,var(--accent) 22%,var(--surface));border-color:transparent}
+.lv3{background:color-mix(in srgb,var(--accent) 42%,var(--surface));border-color:transparent}
+.lv4{background:color-mix(in srgb,var(--accent) 62%,var(--surface));border-color:transparent}
+.lv5{background:color-mix(in srgb,var(--accent) 82%,var(--surface));border-color:transparent}
+.lv6{background:var(--accent);border-color:transparent}
+.na{color:transparent}
+.sync{font-size:.85rem;color:var(--muted);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sync.warn .dot{background:var(--gilt)} .sync.warn{color:var(--ink)}
+.backup{max-width:720px}
+.backup-acts{display:flex;flex-wrap:wrap;gap:8px}
+.backup .chip span{border-radius:10px;white-space:normal}
+.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0)}
+.backup-acts label.btn:has(+ .vh:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.sync .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--neutral)}
+.sync.on .dot{background:var(--ok)}
+
+/* reference */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table.ref{border-collapse:collapse;font-size:.82rem;min-width:1100px;width:100%}
+table.ref th,table.ref td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+table.ref th{position:sticky;top:0;background:var(--sunk);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+table.ref td.nm{font-family:var(--f-display);font-size:.95rem;white-space:nowrap}
+table.ref td.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--neutral)}
+.dot.fire{background:var(--fire)}.dot.water{background:var(--water)}.dot.air{background:var(--air)}.dot.earth{background:var(--earth)}.dot.spirit{background:var(--spirit)}
+.foot{margin-top:28px;color:var(--muted);font-size:.78rem;max-width:70ch}
+@media (prefers-reduced-motion:no-preference){.tcard{animation:deal .35s ease both}@keyframes deal{from{transform:translateY(6px)}to{transform:none}}}
+
+@media (max-width:860px){
+  .backup-acts .btn{flex:1 1 100%;text-align:center}
+  body{padding-inline:max(16px, env(safe-area-inset-left,0px))}
+  header.top{display:contents}
+  header.top > div{padding-block:14px 10px}
+  nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;margin-bottom:12px;box-shadow:0 0 0 6px var(--bg)}
+  nav.tabs button{padding:10px 12px;font-size:.92rem}
+  .tl{display:none} .ts{display:inline}
+  nav.tabs button{flex:1 1 0;padding:10px 4px;font-size:.88rem}
+  details.deckbar{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
+  details.deckbar > summary{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;list-style:none;font-weight:700}
+  details.deckbar > summary::-webkit-details-marker{display:none}
+  details.deckbar > summary::after{content:"Edit";font-weight:400;font-size:.85rem;color:var(--accent)}
+  details.deckbar[open] > summary::after{content:"Done"}
+  details.deckbar > summary .sum-detail{font-weight:400;font-size:.8rem;color:var(--muted);margin-right:auto;font-family:var(--f-mono)}
+  .deck-inner{padding:4px 14px 16px;border-bottom:0;flex-direction:column;gap:16px}
+  .deck-inner .grow{flex:none}
+  #modeSeg{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  #modeSeg span{text-align:center}
+  .modebar{gap:10px}
+  .cell{width:30px;height:26px}
+  table.mm td{padding:4px 3px}
+  .chip span{padding:7px 13px;font-size:.9rem}
+  .seg span{padding:8px 12px;font-size:.9rem}
+  .link{font-size:.9rem;padding:4px 0}
+  .btn{padding:11px 16px}
+  .toolbar{gap:12px;margin-bottom:12px}
+  .toolbar .actions{width:100%;margin-left:0;gap:8px}
+  .toolbar .actions .btn{flex:1}
+  .toolbar .actions .chip{flex-basis:100%}
+  #draw{flex-basis:100%}
+  .spread{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .tc-body{padding:10px 11px 12px}
+  .tc-name{font-size:1.1rem}
+  dl.facts{grid-template-columns:minmax(0,1fr);gap:0}
+  dl.facts dd{margin-bottom:6px}
+  .mask{padding:6px 8px}
+  .qcard{padding:18px 16px 20px;gap:14px}
+  .opts{grid-template-columns:minmax(0,1fr)}
+  .opt{padding:14px;font-size:1rem}
+  .q-foot .keys{display:none}
+  .maps{grid-template-columns:minmax(0,1fr)}
+  .mapbox svg{max-height:none;min-height:0}
+  .q-foot .acts{width:100%}
+  .q-foot .acts .btn{flex:1}
+  .typed input{font-size:16px;padding:12px}
+  .num-in{font-size:16px;padding:7px 8px}
+  select{font-size:16px}
+  .tile{padding:10px;font-size:.88rem}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <h1>Tarot Correspondence Drill</h1>
+    <p class="sub">78 cards · Thoth and Rider–Waite–Smith attributions · Golden Dawn decans</p>
+  </div>
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-tab="spread" aria-selected="true">Spread</button>
+    <button role="tab" data-tab="quiz" aria-selected="false">Quiz</button>
+    <button role="tab" data-tab="maps" aria-selected="false"><span class="tl">Wheel &amp; Tree</span><span class="ts">Maps</span></button>
+    <button role="tab" data-tab="match" aria-selected="false">Match</button>
+    <button role="tab" data-tab="progress" aria-selected="false"><span class="tl">Progress</span><span class="ts">Stats</span></button>
+    <button role="tab" data-tab="ref" aria-selected="false"><span class="tl">Reference</span><span class="ts">Ref</span></button>
+  </nav>
+</header>
+
+<details class="deckbar" id="settings" open>
+  <summary>Deck <span class="sum-detail" id="sumDetail"></span></summary>
+  <div class="deck-inner">
+    <div class="group">
+      <span class="lbl">Card names</span>
+      <div class="seg">
+        <label><input type="radio" name="naming" id="nm-thoth" value="thoth"><span>Thoth</span></label>
+        <label><input type="radio" name="naming" id="nm-rws" value="rws"><span>RWS</span></label>
+        <label><input type="radio" name="naming" id="nm-both" value="both"><span>Both</span></label>
+      </div>
+    </div>
+    <div class="group grow">
+      <span class="lbl">Cards in the deck <span class="pool" id="poolCount"></span></span>
+      <div class="deck-chips"><div class="chips" id="groups"></div><div class="chips" id="suits"></div></div>
+    </div>
+    <div class="group">
+      <span class="lbl">Quick pick</span>
+      <div class="presets">
+        <button class="link" data-preset="all">Full deck</button>
+        <button class="link" data-preset="major">Majors</button>
+        <button class="link" data-preset="minor">Minors</button>
+        <button class="link" data-preset="pips">Aces–10s</button>
+        <button class="link" data-preset="court">Courts</button>
+      </div>
+    </div>
+  </div>
+</details>
+
+<main>
+  <!-- SPREAD -->
+  <section id="tab-spread">
+    <div class="toolbar">
+      <button class="btn primary" id="draw">Draw</button>
+      <div class="group">
+        <span class="lbl">Cards</span>
+        <div class="spreadpick"><div class="seg" id="spreadSeg"></div><input class="num-in" type="number" id="customN" min="1" max="22" aria-label="Number of cards" hidden></div>
+      </div>
+      <div class="actions">
+        <label class="chip"><input type="checkbox" id="reversals"><span>Allow reversed</span></label>
+        <button class="btn" id="revealAll">Reveal all</button>
+        <button class="btn" id="quizSpread">Quiz me on these</button>
+      </div>
+    </div>
+    <details class="qopts" id="displayOpts">
+      <summary>Card display <span class="hint sumtxt" id="dispSum"></span></summary>
+      <div class="qset">
+        <div class="group" style="grid-column:1 / -1">
+          <span class="lbl">Show on drawn cards</span>
+          <div class="chips" id="showChips"></div>
+        </div>
+        <label class="hint" for="hiddenMode">Fields that are off:
+          <select id="hiddenMode">
+            <option value="reveal">tap to reveal</option>
+            <option value="omit">leave off</option>
+          </select>
+        </label>
+      </div>
+    </details>
+    <p class="note" id="spreadNote"></p>
+    <div class="spread" id="spread"></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="tab-quiz" hidden>
+    <div class="modebar">
+      <div class="seg" id="modeSeg">
+        <label><input type="radio" name="qmode" id="qm-smart" value="smart"><span>Smart review</span></label>
+        <label><input type="radio" name="qmode" id="qm-rounds" value="rounds"><span>Shuffled rounds</span></label>
+        <label><input type="radio" name="qmode" id="qm-daily" value="daily"><span>Daily ten</span></label>
+        <label><input type="radio" name="qmode" id="qm-speed" value="speed"><span>Speed round</span></label>
+      </div>
+      <span class="hint" id="modeNote"></span>
+    </div>
+    <details class="qopts" id="qopts">
+      <summary>Quiz settings <span class="hint" id="qoptsSum" style="font-weight:400;margin-right:auto"></span></summary>
+      <div class="qset">
+        <div class="group">
+          <span class="lbl">Ask me about</span>
+          <div class="chips" id="quizFields"></div>
+        </div>
+        <div class="group">
+          <span class="lbl">Direction</span>
+          <div class="seg">
+            <label><input type="radio" name="dir" id="dir-cf" value="cf"><span>Card → fact</span></label>
+            <label><input type="radio" name="dir" id="dir-fc" value="fc"><span>Fact → card</span></label>
+            <label><input type="radio" name="dir" id="dir-mix" value="mix"><span>Mixed</span></label>
+          </div>
+          <span class="lbl" style="margin-top:6px">Answer by</span>
+          <div class="seg">
+            <label><input type="radio" name="ans" id="ans-choice" value="choice"><span>Multiple choice</span></label>
+            <label><input type="radio" name="ans" id="ans-type" value="type"><span>Typing it</span></label>
+          </div>
+        </div>
+        <div class="group">
+          <span class="lbl">Cards from</span>
+          <div class="seg">
+            <label><input type="radio" name="src" id="src-pool" value="pool"><span>Deck setting</span></label>
+            <label><input type="radio" name="src" id="src-spread" value="spread"><span>Last spread</span></label>
+            <label><input type="radio" name="src" id="src-missed" value="missed"><span>Missed today</span></label>
+          </div>
+        </div>
+      </div>
+    </details>
+    <div class="score" id="scoreBar"></div>
+    <div class="qcard" id="qcard"></div>
+    <div class="missed" id="missedBox"></div>
+  </section>
+
+  <!-- MAPS -->
+  <section id="tab-maps" hidden>
+    <div class="modebar">
+      <div class="seg">
+        <label><input type="radio" name="mapkind" id="mk-wheel" value="wheel"><span>Zodiac wheel</span></label>
+        <label><input type="radio" name="mapkind" id="mk-tree" value="tree"><span>Tree of Life</span></label>
+      </div>
+      <div class="seg">
+        <label><input type="radio" name="mapmode" id="mm-explore" value="explore"><span>Explore</span></label>
+        <label><input type="radio" name="mapmode" id="mm-find" value="find"><span>Find it</span></label>
+      </div>
+      <span class="score" id="mapScore" style="margin:0"></span>
+    </div>
+    <div class="maps">
+      <div class="mapbox" id="mapSvg"></div>
+      <div class="side" id="mapSide"></div>
+    </div>
+  </section>
+
+  <!-- MATCH -->
+  <section id="tab-match" hidden>
+    <div class="modebar">
+      <div class="group">
+        <span class="lbl">Match cards to</span>
+        <div class="seg" id="matchField"></div>
+      </div>
+      <button class="btn" id="matchNew">New board</button>
+      <span class="score" id="matchScore" style="margin:0"></span>
+    </div>
+    <p class="note">Tap a card, then tap what goes with it. Six pairs per board, drawn from your deck setting.</p>
+    <div id="matchBoard"></div>
+  </section>
+
+  <!-- PROGRESS -->
+  <section id="tab-progress" hidden>
+    <div class="tiles" id="statTiles"></div>
+    <h2 class="sec">Study stages</h2>
+    <div class="stages" id="stages"></div>
+    <h2 class="sec">Mastery map</h2>
+    <p class="note">Each square is one card and one topic. It darkens as the spacing between reviews grows. Red means you missed it recently. Tap any square to be quizzed on it.</p>
+    <div class="legend" id="legend"></div>
+    <div class="mapwrap"><table class="mm" id="mmTable"></table></div>
+    <h2 class="sec" style="margin-top:26px">Progress file</h2>
+    <div class="infocard backup">
+      <p class="note" style="margin:0">Your progress is kept in this browser. Save it to a file to keep your own copy, or to move it to another device or a new copy of this page. Loading a file merges it with what's here, keeping the more recent result for each item, so nothing is lost.</p>
+      <div class="sync" id="backupStatus"></div>
+      <div class="backup-acts">
+        <button class="btn primary" id="exportBtn">Save progress file</button>
+        <label class="btn" for="importFile">Load progress file</label>
+        <input type="file" id="importFile" class="vh" accept=".json,application/json">
+      </div>
+      <label class="chip"><input type="checkbox" id="importSettings"><span>When loading, also apply the deck and display settings from the file</span></label>
+      <div class="fb" id="backupMsg" aria-live="polite"></div>
+    </div>
+    <div style="margin-top:14px"><button class="btn quiet" id="resetProg">Reset all progress</button></div>
+  </section>
+
+  <!-- REFERENCE -->
+  <section id="tab-ref" hidden>
+    <p class="note">Every card in your current deck setting, with all attributions.</p>
+    <div class="tablewrap"><table class="ref" id="refTable"></table></div>
+    <p class="foot">Attributions follow the Golden Dawn system as used in Crowley's Thoth deck (Book T titles, decans, court zodiac spans). In the Thoth deck the Emperor takes Tzaddi and the Star takes Heh; the RWS/Golden Dawn order reverses them. Decan dates are approximate and shift by a day or so each year.</p>
+  </section>
+
+
+</main>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const VS='︎';
+const SIGNS=['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+const SIGN_G={Aries:'♈',Taurus:'♉',Gemini:'♊',Cancer:'♋',Leo:'♌',Virgo:'♍',Libra:'♎',Scorpio:'♏',Sagittarius:'♐',Capricorn:'♑',Aquarius:'♒',Pisces:'♓'};
+const SIGN_EL={Aries:'Fire',Taurus:'Earth',Gemini:'Air',Cancer:'Water',Leo:'Fire',Virgo:'Earth',Libra:'Air',Scorpio:'Water',Sagittarius:'Fire',Capricorn:'Earth',Aquarius:'Air',Pisces:'Water'};
+const MODS=['cardinal','fixed','mutable'],ORD=['first','second','third'],BASE=[2,5,8];
+const INGRESS={Aries:'Mar 21',Taurus:'Apr 21',Gemini:'May 21',Cancer:'Jun 21',Leo:'Jul 22',Virgo:'Aug 23',Libra:'Sep 23',Scorpio:'Oct 23',Sagittarius:'Nov 23',Capricorn:'Dec 22',Aquarius:'Jan 20',Pisces:'Feb 19'};
+const PLAN_G={Sun:'☉',Moon:'☽',Mercury:'☿',Venus:'♀',Mars:'♂',Jupiter:'♃',Saturn:'♄'};
+const CHALDEAN=['Saturn','Jupiter','Mars','Sun','Venus','Mercury','Moon'];
+const PKW={Saturn:'restriction and weight',Jupiter:'expansion and benefit',Mars:'force and conflict',Sun:'harmony and success',Venus:'love and ease',Mercury:'thought and motion',Moon:'change and reflection'};
+const SKW={Aries:'raw new energy',Taurus:'stubborn matter',Gemini:'restless thought',Cancer:'feeling and nurture',Leo:'will and pride',Virgo:'careful refinement',Libra:'balance',Scorpio:'deep desire and change',Sagittarius:'aspiration',Capricorn:'ambition and form',Aquarius:'ideals',Pisces:'dissolving emotion'};
+const LETTERS=['aleph','beth','gimel','daleth','heh','vav','zain','cheth','teth','yod','kaph','lamed','mem','nun','samekh','ayin','peh','tzaddi','qoph','resh','shin','tav'];
+const MOTHER=['aleph','mem','shin'],DOUBLE=['beth','gimel','daleth','kaph','peh','resh','tav'];
+const letterType=k=>MOTHER.includes(k)?'mother':DOUBLE.includes(k)?'double':'simple';
+const HEB={aleph:['Aleph','א',['alef']],beth:['Beth','ב',['bet','beit']],gimel:['Gimel','ג',[]],daleth:['Daleth','ד',['dalet']],heh:['Heh','ה',['he','hey']],vav:['Vav','ו',['vau','waw']],zain:['Zain','ז',['zayin']],cheth:['Cheth','ח',['heth','chet','het']],teth:['Teth','ט',['tet']],yod:['Yod','י',['yud','yodh']],kaph:['Kaph','כ',['kaf','caph']],lamed:['Lamed','ל',['lamedh']],mem:['Mem','מ',[]],nun:['Nun','נ',[]],samekh:['Samekh','ס',['samech']],ayin:['Ayin','ע',[]],peh:['Peh','פ',['pe']],tzaddi:['Tzaddi','צ',['tzadi','tsadi','tzaddik','sadhe']],qoph:['Qoph','ק',['qof','kuf','koph']],resh:['Resh','ר',[]],shin:['Shin','ש',[]],tav:['Tav','ת',['tau']]};
+const SEPH=['','Kether','Chokmah','Binah','Chesed','Geburah','Tiphareth','Netzach','Hod','Yesod','Malkuth'];
+const SEPH_ALT={Kether:['keter'],Chokmah:['chokhmah','hokmah','chochmah'],Binah:[],Chesed:['hesed'],Geburah:['gevurah'],Tiphareth:['tiferet','tipheret','tiphereth'],Netzach:['netzah','netsah'],Hod:[],Yesod:[],Malkuth:['malkhut','malchut']};
+const PATHS=[[1,2],[1,3],[1,6],[2,3],[2,6],[2,4],[3,6],[3,5],[4,5],[4,6],[4,7],[5,6],[5,8],[6,7],[6,9],[6,8],[7,8],[7,9],[7,10],[8,9],[8,10],[9,10]]; // paths 11–32 in letter order
+const WORD=['','Ace','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'];
+const roman=n=>{if(n===0)return'0';const m=[[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];let s='';for(const[v,r]of m)while(n>=v){s+=r;n-=v}return s};
+const unroman=s=>{const v={i:1,v:5,x:10,l:50};let t=0;s=s.toLowerCase();for(let i=0;i<s.length;i++){const a=v[s[i]],b=v[s[i+1]]||0;t+=a<b?-a:a}return t};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
+const SUITS=[
+ {id:'wands',thoth:'Wands',rws:'Wands',el:'Fire'},
+ {id:'cups',thoth:'Cups',rws:'Cups',el:'Water'},
+ {id:'swords',thoth:'Swords',rws:'Swords',el:'Air'},
+ {id:'disks',thoth:'Disks',rws:'Pentacles',el:'Earth'}];
+const SUIT={};SUITS.forEach(s=>SUIT[s.id]=s);
+const SUIT_OF_EL={Fire:'wands',Water:'cups',Air:'swords',Earth:'disks'};
+
+const MAJ=[
+ [0,'The Fool','The Fool',0,'aleph','el','Air','The Spirit of Aethyr'],
+ [1,'The Magus','The Magician',1,'beth','pl','Mercury','The Magus of Power'],
+ [2,'The Priestess','The High Priestess',2,'gimel','pl','Moon','The Priestess of the Silver Star'],
+ [3,'The Empress','The Empress',3,'daleth','pl','Venus','The Daughter of the Mighty Ones'],
+ [4,'The Emperor','The Emperor',4,'tzaddi','zo','Aries','Sun of the Morning, Chief among the Mighty'],
+ [5,'The Hierophant','The Hierophant',5,'vav','zo','Taurus','The Magus of the Eternal'],
+ [6,'The Lovers','The Lovers',6,'zain','zo','Gemini','The Children of the Voice; the Oracle of the Mighty Gods'],
+ [7,'The Chariot','The Chariot',7,'cheth','zo','Cancer','The Child of the Powers of the Waters; the Lord of the Triumph of Light'],
+ [8,'Adjustment','Justice',11,'lamed','zo','Libra','The Daughter of the Lords of Truth; the Ruler of the Balance'],
+ [9,'The Hermit','The Hermit',9,'yod','zo','Virgo','The Prophet of the Eternal; the Magus of the Voice of Power'],
+ [10,'Fortune','Wheel of Fortune',10,'kaph','pl','Jupiter','The Lord of the Forces of Life'],
+ [11,'Lust','Strength',8,'teth','zo','Leo','The Daughter of the Flaming Sword; the Leader of the Lion'],
+ [12,'The Hanged Man','The Hanged Man',12,'mem','el','Water','The Spirit of the Mighty Waters'],
+ [13,'Death','Death',13,'nun','zo','Scorpio','The Child of the Great Transformers; the Lord of the Gate of Death'],
+ [14,'Art','Temperance',14,'samekh','zo','Sagittarius','The Daughter of the Reconcilers; the Bringer-forth of Life'],
+ [15,'The Devil','The Devil',15,'ayin','zo','Capricorn','The Lord of the Gates of Matter; the Child of the Forces of Time'],
+ [16,'The Tower','The Tower',16,'peh','pl','Mars','The Lord of the Hosts of the Mighty'],
+ [17,'The Star','The Star',17,'heh','zo','Aquarius','The Daughter of the Firmament; the Dweller between the Waters'],
+ [18,'The Moon','The Moon',18,'qoph','zo','Pisces','The Ruler of Flux and Reflux; the Child of the Sons of the Mighty'],
+ [19,'The Sun','The Sun',19,'resh','pl','Sun','The Lord of the Fire of the World'],
+ [20,'The Aeon','Judgement',20,'shin','el','Fire','The Spirit of the Primal Fire'],
+ [21,'The Universe','The World',21,'tav','pl','Saturn','The Great One of the Night of Time']];
+const PIPS={
+ wands:[['Dominion','Mars','Aries','Mar 21 – Mar 30'],['Virtue','Sun','Aries','Mar 31 – Apr 10'],['Completion','Venus','Aries','Apr 11 – Apr 20'],['Strife','Saturn','Leo','Jul 22 – Aug 1'],['Victory','Jupiter','Leo','Aug 2 – Aug 11'],['Valour','Mars','Leo','Aug 12 – Aug 22'],['Swiftness','Mercury','Sagittarius','Nov 23 – Dec 2'],['Strength','Moon','Sagittarius','Dec 3 – Dec 12'],['Oppression','Saturn','Sagittarius','Dec 13 – Dec 21']],
+ cups:[['Love','Venus','Cancer','Jun 21 – Jul 1'],['Abundance','Mercury','Cancer','Jul 2 – Jul 11'],['Luxury','Moon','Cancer','Jul 12 – Jul 21'],['Disappointment','Mars','Scorpio','Oct 23 – Nov 1'],['Pleasure','Sun','Scorpio','Nov 2 – Nov 12'],['Debauch','Venus','Scorpio','Nov 13 – Nov 22'],['Indolence','Saturn','Pisces','Feb 19 – Feb 28'],['Happiness','Jupiter','Pisces','Mar 1 – Mar 10'],['Satiety','Mars','Pisces','Mar 11 – Mar 20']],
+ swords:[['Peace','Moon','Libra','Sep 23 – Oct 2'],['Sorrow','Saturn','Libra','Oct 3 – Oct 12'],['Truce','Jupiter','Libra','Oct 13 – Oct 22'],['Defeat','Venus','Aquarius','Jan 20 – Jan 29'],['Science','Mercury','Aquarius','Jan 30 – Feb 8'],['Futility','Moon','Aquarius','Feb 9 – Feb 18'],['Interference','Jupiter','Gemini','May 21 – May 31'],['Cruelty','Mars','Gemini','Jun 1 – Jun 10'],['Ruin','Sun','Gemini','Jun 11 – Jun 20']],
+ disks:[['Change','Jupiter','Capricorn','Dec 22 – Dec 30'],['Works','Mars','Capricorn','Dec 31 – Jan 9'],['Power','Sun','Capricorn','Jan 10 – Jan 19'],['Worry','Mercury','Taurus','Apr 21 – Apr 30'],['Success','Moon','Taurus','May 1 – May 10'],['Failure','Saturn','Taurus','May 11 – May 20'],['Prudence','Sun','Virgo','Aug 23 – Sep 1'],['Gain','Venus','Virgo','Sep 2 – Sep 11'],['Wealth','Mercury','Virgo','Sep 12 – Sep 22']]};
+const COURTS=[{t:'Knight',r:'King',sub:'Fire',seph:'Chokmah',yhvh:'Yod'},{t:'Queen',r:'Queen',sub:'Water',seph:'Binah',yhvh:'Heh'},{t:'Prince',r:'Knight',sub:'Air',seph:'Tiphareth',yhvh:'Vav'},{t:'Princess',r:'Page',sub:'Earth',seph:'Malkuth',yhvh:'Heh final'}];
+const COURT_SIGN={
+ wands:{Knight:'21° Scorpio – 20° Sagittarius',Queen:'21° Pisces – 20° Aries',Prince:'21° Cancer – 20° Leo',Princess:'Quadrant of Cancer, Leo, Virgo'},
+ cups:{Knight:'21° Aquarius – 20° Pisces',Queen:'21° Gemini – 20° Cancer',Prince:'21° Libra – 20° Scorpio',Princess:'Quadrant of Libra, Scorpio, Sagittarius'},
+ swords:{Knight:'21° Taurus – 20° Gemini',Queen:'21° Virgo – 20° Libra',Prince:'21° Capricorn – 20° Aquarius',Princess:'Quadrant of Capricorn, Aquarius, Pisces'},
+ disks:{Knight:'21° Leo – 20° Virgo',Queen:'21° Sagittarius – 20° Capricorn',Prince:'21° Aries – 20° Taurus',Princess:'Quadrant of Aries, Taurus, Gemini'}};
+const COURT_TITLE={
+ wands:{Knight:'Lord of the Flame and the Lightning; King of the Spirits of Fire',Queen:'Queen of the Thrones of Flame',Prince:'Prince of the Chariot of Fire',Princess:'Princess of the Shining Flame; Rose of the Palace of Fire'},
+ cups:{Knight:'Lord of the Waves and the Waters; King of the Hosts of the Sea',Queen:'Queen of the Thrones of the Waters',Prince:'Prince of the Chariot of the Waters',Princess:'Princess of the Waters; Lotus of the Palace of the Floods'},
+ swords:{Knight:'Lord of the Wind and the Breezes; King of the Spirits of Air',Queen:'Queen of the Thrones of Air',Prince:'Prince of the Chariot of the Winds',Princess:'Princess of the Rushing Winds; Lotus of the Palace of Air'},
+ disks:{Knight:'Lord of the Wide and Fertile Land; King of the Spirits of Earth',Queen:'Queen of the Thrones of Earth',Prince:'Prince of the Chariot of Earth',Princess:'Princess of the Echoing Hills; Rose of the Palace of Earth'}};
+const SIGN_RE=new RegExp('\\b('+SIGNS.join('|')+')\\b','g');
+const signsIn=s=>(s.match(SIGN_RE)||[]);
+
+const CARDS=[];
+MAJ.forEach(([tn,tName,rName,rn,heb,kind,attr,eso])=>{
+  CARDS.push({id:'M'+tn,group:'major',order:tn,tName,rName,tn,rn,heb,hebR:heb==='tzaddi'?'heh':heb==='heh'?'tzaddi':heb,kind,attr,
+    element:kind==='el'?attr:kind==='zo'?SIGN_EL[attr]:(attr==='Saturn'?'Earth':null),
+    planet:kind==='pl'?attr:null, sign:kind==='zo'?attr:null, esoteric:eso});
+});
+SUITS.forEach((s,si)=>{
+  const quad=signsIn(COURT_SIGN[s.id].Princess);
+  const quadDecs=quad.flatMap(g=>{const i=SIGNS.indexOf(g)*3;return[i,i+1,i+2]});
+  CARDS.push({id:s.id+'1',group:'ace',suit:s.id,n:1,order:100+si*20+1,element:s.el,title:'Root of the Powers of '+s.el,sephirah:'Kether',decs:quadDecs,quad});
+  PIPS[s.id].forEach(([title,planet,sign,dates],i)=>{const n=i+2;const sgi=SIGNS.indexOf(sign);
+    CARDS.push({id:s.id+n,group:'number',suit:s.id,n,order:100+si*20+n,element:s.el,title,planet,sign,dates,sephirah:SEPH[n],dec:sgi*3+(n-BASE[sgi%3])});});
+  COURTS.forEach((c,ci)=>{const span=COURT_SIGN[s.id][c.t];let decs;
+    if(c.t==='Princess')decs=quadDecs;else{const a=SIGNS.indexOf(signsIn(span)[0])*3+2;decs=[a,a+1,a+2].map(x=>x%36)}
+    CARDS.push({id:s.id+c.t,group:'court',suit:s.id,rank:c,order:100+si*20+11+ci,element:c.sub+' of '+s.el,sign:span,esoteric:COURT_TITLE[s.id][c.t],sephirah:c.seph,decs});});
+});
+const BYID={};CARDS.forEach(c=>BYID[c.id]=c);
+const NUMBERED=CARDS.filter(c=>c.group==='number');
+const BYDEC=[];NUMBERED.forEach(c=>BYDEC[c.dec]=c);
+
+const GROUPS=[['major','Trumps (Major)'],['ace','Aces'],['number','Numbered 2–10'],['court','Courts']];
+const FIELDS=[['name','Name'],['number','Number'],['suit','Suit'],['element','Element'],['planet','Planet'],['sign','Sign'],['title','Title'],['hebrew','Hebrew letter'],['sephirah','Sephirah'],['dates','Decan dates'],['esoteric','Esoteric title'],['other','Other deck’s name']];
+const QFIELDS=['number','element','planet','sign','title','hebrew','sephirah','dates','esoteric','other'];
+const STAGES=[
+ {id:1,name:'Stage 1 · Numbered cards',desc:'Aces and 2–10: titles, elements, sephiroth',groups:['ace','number'],fields:['title','element','sephirah']},
+ {id:2,name:'Stage 2 · Courts and Majors',desc:'Numbers, Hebrew letters, elements, attributions, other-deck names',groups:['major','court'],fields:['number','element','hebrew','planet','sign','sephirah','other']},
+ {id:3,name:'Stage 3 · Astrology and decans',desc:'Decan planets, signs and dates; court zodiac spans',groups:['number','court'],fields:['planet','sign','dates']}];
+
+/* ---------- settings (per device) ---------- */
+const DEF={naming:'thoth',groups:{major:true,ace:true,number:true,court:true},suits:{wands:true,cups:true,swords:true,disks:true},
+  show:{name:true,number:true,suit:true,element:true,planet:false,sign:false,title:false,hebrew:false,sephirah:false,dates:false,esoteric:false,other:false},
+  hiddenMode:'reveal',spreadN:3,reversals:false,
+  qf:{number:true,element:true,planet:true,sign:true,title:true,hebrew:false,sephirah:false,dates:false,esoteric:false,other:false,patterns:true},
+  dir:'mix',ans:'choice',src:'pool',mode:'smart',mapKind:'wheel',mapMode:'explore',matchField:'title'};
+let S=JSON.parse(JSON.stringify(DEF));
+try{const raw=localStorage.getItem('tarot-drill-v1');if(raw){const o=JSON.parse(raw);for(const k in DEF){if(o[k]!==undefined){S[k]=(typeof DEF[k]==='object')?Object.assign({},DEF[k],o[k]):o[k]}}}}catch(e){}
+const save=()=>{try{localStorage.setItem('tarot-drill-v1',JSON.stringify(S))}catch(e){}};
+
+/* ---------- progress (synced across devices when available) ---------- */
+const DAY=864e5,MIN=6e4;
+const INTERVALS=[0,10*MIN,DAY,3*DAY,7*DAY,16*DAY,35*DAY];
+const blankP=()=>({v:1,srs:{},daily:{last:null,streak:0,best:0,lastScore:null},speed:{best:0,last:null},match:{},stats:{n:0,r:0},t:0});
+let P=blankP();
+try{const raw=localStorage.getItem('tarot-drill-progress');if(raw)P=Object.assign(blankP(),JSON.parse(raw))}catch(e){}
+function mergeP(a,b){
+  const o=JSON.parse(JSON.stringify(a));
+  for(const k in (b.srs||{})){if(!o.srs[k]||(b.srs[k].t||0)>(o.srs[k].t||0))o.srs[k]=b.srs[k]}
+  const da=a.daily||{},db=b.daily||{};
+  if((db.last||'')>(da.last||''))o.daily=Object.assign({},db);
+  o.daily.best=Math.max(da.best||0,db.best||0);
+  o.speed={best:Math.max(a.speed?.best||0,b.speed?.best||0),last:(a.speed?.last||b.speed?.last||null)};
+  o.match=Object.assign({},b.match||{},a.match||{});for(const k in (b.match||{}))if(a.match?.[k])o.match[k]=Math.min(a.match[k],b.match[k]);
+  o.stats=(b.stats?.n||0)>(a.stats?.n||0)?Object.assign({},b.stats):o.stats;
+  o.t=Math.max(a.t||0,b.t||0);return o;
+}
+function saveP(){P.t=Date.now();try{localStorage.setItem('tarot-drill-progress',JSON.stringify(P))}catch(e){}}
+/* progress file: save a copy, load it anywhere (this page, another device, a self-hosted copy) */
+const FILE_APP='tarot-correspondence-drill';
+function lastExport(){try{return JSON.parse(localStorage.getItem('tarot-drill-lastexport')||'null')}catch(e){return null}}
+function daysAgo(t){const d=Math.floor((Date.now()-t)/DAY);return d<=0?'today':d===1?'yesterday':d+' days ago'}
+async function exportProgress(){
+  const name='tarot-drill-progress-'+todayStr()+'.json';
+  const text=JSON.stringify({app:FILE_APP,format:1,exported:new Date().toISOString(),progress:P,settings:S});
+  const msg=$('#backupMsg');msg.className='fb';msg.textContent='';
+  let saved=false;
+  try{
+    const dl=window.claude&&window.claude.use?await window.claude.use('downloads'):null;
+    if(dl){await dl.save({filename:name,data:text});saved=true}
+    else{ // running outside Claude: an ordinary browser download
+      const url=URL.createObjectURL(new Blob([text],{type:'application/json'}));
+      const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);saved=true}
+  }catch(e){
+    const c=e&&e.code;
+    msg.className='fb no';
+    msg.textContent=c==='declined'?'Save cancelled. Nothing was saved.':c==='rate_limited'?'A save prompt is already open. Finish that one first.':'The file could not be saved here.';
+    return;
+  }
+  if(saved){try{localStorage.setItem('tarot-drill-lastexport',JSON.stringify({t:Date.now(),pt:P.t,name}))}catch(e){}
+    msg.className='fb ok';msg.textContent='Saved '+name+'.';renderBackup()}
+}
+async function importProgress(file){
+  const msg=$('#backupMsg');msg.className='fb';msg.textContent='';
+  if(!file)return;
+  let data;
+  try{data=JSON.parse(await file.text())}catch(e){msg.className='fb no';msg.textContent='That file isn\u2019t a progress file (it couldn\u2019t be read as JSON).';return}
+  const prog=data&&data.app===FILE_APP?data.progress:(data&&data.srs?data:null);
+  if(!prog||typeof prog.srs!=='object'){msg.className='fb no';msg.textContent='That file isn\u2019t a Tarot Correspondence Drill progress file.';return}
+  const inFile=Object.keys(prog.srs).length;
+  P=mergeP(P,Object.assign(blankP(),prog));saveP();
+  let extra='';
+  if($('#importSettings').checked&&data.settings){const o=data.settings;for(const k in DEF){if(o[k]!==undefined)S[k]=(typeof DEF[k]==='object')?Object.assign({},DEF[k],o[k]):o[k]}
+    save();buildSide();syncSpreadSeg();draw();renderRef();buildMatchFields();newMatch();extra=' Deck and display settings applied.'}
+  VALID.key='';APPL.key='';
+  msg.className='fb ok';
+  msg.textContent='Loaded '+file.name+(data.exported?' (saved '+new Date(data.exported).toLocaleDateString()+')':'')+': '+inFile+' items in the file, '+Object.keys(P.srs).length+' items tracked now.'+extra;
+  renderProgress();renderScore();
+}
+const todayStr=(d=new Date())=>d.toLocaleDateString('en-CA');
+const yesterdayStr=()=>todayStr(new Date(Date.now()-DAY));
+
+/* ---------- card text ---------- */
+const suitName=(c,sys)=>sys==='rws'?SUIT[c.suit].rws:SUIT[c.suit].thoth;
+const suitLabel=id=>S.naming==='rws'?SUIT[id].rws:SUIT[id].thoth;
+function nameIn(c,sys){
+  if(c.group==='major')return sys==='rws'?c.rName:c.tName;
+  if(c.group==='court')return (sys==='rws'?c.rank.r:c.rank.t)+' of '+suitName(c,sys);
+  return WORD[c.n]+' of '+suitName(c,sys);
+}
+function names(c){const t=nameIn(c,'thoth'),r=nameIn(c,'rws');
+  if(S.naming==='thoth')return[t,null]; if(S.naming==='rws')return[r,null]; return[t,t===r?null:r];}
+const nameStr=c=>{const[a,b]=names(c);return b?a+' ('+b+')':a};
+const shortName=c=>names(c)[0];
+const hebKeyOf=c=>S.naming==='rws'?c.hebR:c.heb;
+function val(c,k){
+  switch(k){
+    case 'name':return nameStr(c);
+    case 'number':
+      if(c.group==='major'){const t=roman(c.tn),r=roman(c.rn);
+        if(S.naming==='rws')return r; if(S.naming==='both'&&t!==r)return t+' (RWS '+r+')'; return t;}
+      if(c.group==='ace')return 'Ace'; if(c.group==='number')return String(c.n); return null;
+    case 'suit':if(c.group==='major')return null; if(S.naming==='both'&&c.suit==='disks')return 'Disks (Pentacles)'; return suitName(c,S.naming);
+    case 'hebrew':if(c.group!=='major')return null;{const t=HEB[c.heb][0],r=HEB[c.hebR][0];
+      if(S.naming==='rws')return r; if(S.naming==='both'&&t!==r)return t+' (RWS: '+r+')'; return t;}
+    case 'other':{if(S.naming==='both')return null;const o=nameIn(c,S.naming==='rws'?'thoth':'rws');return o===nameIn(c,S.naming)?null:o;}
+    default:return c[k]??null;
+  }
+}
+const otherLabel=()=>S.naming==='rws'?'Thoth name':'RWS name';
+const labelOf=k=>k==='other'?otherLabel():k==='patterns'?'Patterns':(FIELDS.find(f=>f[0]===k)||[k,k])[1];
+const PLAN_RE=new RegExp('\\b('+Object.keys(PLAN_G).join('|')+')\\b','g');
+function deco(k,v){
+  let h=esc(v);
+  if(k==='sign'||k==='decan'||k==='any')h=h.replace(SIGN_RE,m=>'<span class="g" aria-hidden="true">'+SIGN_G[m]+VS+'</span>'+m);
+  if(k==='planet'||k==='decan'||k==='any')h=h.replace(PLAN_RE,m=>'<span class="g" aria-hidden="true">'+PLAN_G[m]+VS+'</span>'+m);
+  if(k==='element')h=h.replace(/\b(Fire|Water|Air|Earth)\b/g,m=>'<span class="elname '+m.toLowerCase()+'">'+m+'</span>');
+  if(k==='hebrew'){for(const key in HEB){const[n,g]=HEB[key];h=h.replace(new RegExp('\\b'+n+'\\b'),'<span class="heb" aria-hidden="true">'+g+'</span>'+n)}}
+  return h;
+}
+const hebH=key=>'<span class="heb" aria-hidden="true">'+HEB[key][1]+'</span>'+HEB[key][0];
+function elClass(c){
+  if(c.group!=='major')return 'el-'+SUIT[c.suit].el.toLowerCase();
+  if(c.kind==='pl')return 'el-spirit';
+  return 'el-'+(c.element||'spirit').toLowerCase();
+}
+const inPool=c=>S.groups[c.group]&&(c.group==='major'||S.suits[c.suit]);
+const pool=()=>CARDS.filter(inPool);
+const B=s=>'<b>'+s+'</b>';
+
+/* ---------- explanations & hints ---------- */
+const pathOf=c=>LETTERS.indexOf(S.naming==='both'?c.heb:hebKeyOf(c))+11;
+function decanCardsH(decs){return decs.map(d=>esc(shortName(BYDEC[d]))).join(', ')}
+function explain(c){
+  const N=B(esc(shortName(c)));
+  if(c.group==='number'){const si=SIGNS.indexOf(c.sign),d=c.dec%3;
+    return N+' is '+B(deco('decan',c.planet+' in '+c.sign))+', the '+ORD[d]+' decan of '+c.sign+' (a '+MODS[si%3]+' '+SIGN_EL[c.sign]+' sign). As a '+c.n+' it sits in '+c.sephirah+', and its Thoth title is '+B(esc(c.title))+'. The Sun passes through it about '+esc(c.dates)+'.';}
+  if(c.group==='ace')return N+' is the Root of the Powers of '+c.element+', placed in Kether. Its throne is the quadrant of '+deco('sign',c.quad.join(', '))+', centred on the fixed sign '+deco('sign',c.quad[1])+'.';
+  if(c.group==='court'){const r=c.rank;let s=N+' is '+B(c.element)+': the '+r.t+' carries '+r.sub+' ('+r.yhvh+' of YHVH) and the suit carries '+SUIT[c.suit].el+'. It sits in '+c.sephirah+'. ';
+    if(r.t==='Princess')s+='It rules the quadrant of '+deco('sign',signsIn(c.sign).join(', '))+' and is the throne of the Ace.';
+    else s+='It rules '+deco('sign',c.sign)+', the decans of '+decanCardsH(c.decs)+'.';
+    return s;}
+  const key=S.naming==='both'?c.heb:hebKeyOf(c),pos=LETTERS.indexOf(key)+1,typ=letterType(key);
+  const num=S.naming==='rws'?roman(c.rn):roman(c.tn);
+  const [a,b]=PATHS[pos-1];
+  let s='Atu '+num+' '+N+' carries '+hebH(key)+', letter '+pos+' of 22. That is a '+typ+' letter, so it takes '+(typ==='mother'?'an element':typ==='double'?'a planet':'a sign')+': '+B(deco('any',c.attr))+'. It sits on path '+(pos+10)+' of the Tree, joining '+SEPH[a]+' and '+SEPH[b]+'.';
+  if(c.id==='M4'||c.id==='M17')s+=' Crowley swapped Tzaddi and Heh between the Emperor and the Star; the Golden Dawn and RWS order gives the Emperor Heh and the Star Tzaddi.';
+  if(c.id==='M8'||c.id==='M11')s+=' The Golden Dawn put Strength at VIII and Justice at XI; Crowley restored Lust to XI and Adjustment to VIII so they follow the letters Teth and Lamed in order.';
+  return s;
+}
+function hint(c,k,dir){
+  const suitT=c.suit?suitLabel(c.suit):'';
+  if(dir==='fc'){
+    if(c.group==='major'){const key=hebKeyOf(c);return 'It’s a '+letterType(key)+'-letter trump.'+(k==='number'?' The Atu number is its letter’s position minus one.':'')}
+    if(c.group==='number'&&(k==='planet'||k==='sign')){const si=SIGNS.indexOf(c.sign);return 'It’s in '+suitT+'. '+c.sign+' is the '+MODS[si%3]+' '+SIGN_EL[c.sign]+' sign, so look at '+BASE[si%3]+'–'+(BASE[si%3]+2)+'.'}
+    if(c.group==='number'&&k==='title')return 'It’s in '+suitT+'. Think '+PKW[c.planet]+' working through '+SKW[c.sign]+'.';
+    return 'It’s in '+suitT+'.';
+  }
+  switch(k){
+    case 'number':return 'The Atu number is its Hebrew letter’s position minus one (the Fool is Aleph, the first letter, so 0). Its letter is '+hebH(hebKeyOf(c))+'.';
+    case 'element':
+      if(c.group==='court')return 'Rank gives the first element (Knight Fire, Queen Water, Prince Air, Princess Earth); the suit gives the second.';
+      if(c.group==='major'){const t=letterType(hebKeyOf(c));return t==='mother'?'Mother letters carry the elements: Aleph Air, Mem Water, Shin Fire.':t==='simple'?'It’s a sign card. Work out the sign, then that sign’s element.':'Planetary trumps carry no element, except the Universe, which also holds Earth.'}
+      return 'The suit sets the element: Wands Fire, Cups Water, Swords Air, '+suitLabel('disks')+' Earth.';
+    case 'planet':
+      if(c.group==='number'){const p=BYDEC[(c.dec+35)%36];return 'Decan planets run in Chaldean order (Saturn, Jupiter, Mars, Sun, Venus, Mercury, Moon), starting with Mars on the Two of Wands. The decan before this one, '+esc(shortName(p))+', is '+deco('planet',p.planet)+'.'}
+      return 'Its letter, '+hebH(hebKeyOf(c))+', is a double letter, so it takes one of the seven planets.';
+    case 'sign':
+      if(c.group==='number')return suitT+' holds the '+c.element+' signs. 2–4 fall in the cardinal sign, 5–7 the fixed, 8–10 the mutable.';
+      if(c.group==='court')return c.rank.t==='Princess'?'Princesses rule a whole quadrant: the three signs centred on the fixed sign of their element.':'Courts run from the last decan of one sign to the second decan of the next. Queens end in the cardinal sign, Princes in the fixed sign, Knights in the mutable sign of their element.';
+      return 'Its letter, '+hebH(hebKeyOf(c))+', is a simple letter. The simple letters walk the zodiac in order, starting with the Emperor on Aries.';
+    case 'title':
+      if(c.group==='ace')return 'Every Ace’s title has the form “Root of the Powers of [element]”.';
+      return 'Think '+deco('decan',c.planet+' in '+c.sign)+': '+PKW[c.planet]+' working through '+SKW[c.sign]+'. It’s the '+c.sephirah+' card of '+suitT+'.';
+    case 'hebrew':return 'The letter’s position is the Atu number plus one (the Fool, 0, is Aleph).'+((c.id==='M4'||c.id==='M17')&&S.naming!=='rws'?' Watch for Crowley’s Tzaddi/Heh swap.':'');
+    case 'sephirah':return c.group==='court'?'Courts follow the four letters of YHVH down the Tree: Yod, Heh, Vav, Heh final.':'Numbers run straight down the Tree, 1 Kether to 10 Malkuth.';
+    case 'dates':return 'Find the sign first. Its three decans run in 10-day blocks from the Sun’s entry around '+INGRESS[c.sign]+'.';
+    case 'esoteric':return 'It begins “'+esc(c.esoteric.split(' ').slice(0,3).join(' '))+'…”';
+    case 'other':return 'Thoth renames: Magician→Magus, High Priestess→Priestess, Justice→Adjustment, Strength→Lust, Wheel of Fortune→Fortune, Temperance→Art, Judgement→Aeon, World→Universe. Courts: King→Knight, Knight→Prince, Page→Princess.';
+  }
+  return '';
+}
+
+/* ---------- build controls ---------- */
+function chip(id,label,checked,on){const l=document.createElement('label');l.className='chip';
+  l.innerHTML='<input type="checkbox" id="'+id+'"'+(checked?' checked':'')+'><span>'+label+'</span>';
+  l.querySelector('input').addEventListener('change',e=>on(e.target.checked));return l;}
+function buildSide(){
+  $('#nm-'+S.naming).checked=true;
+  const g=$('#groups');g.innerHTML='';GROUPS.forEach(([k,l])=>g.append(chip('grp-'+k,l,S.groups[k],v=>{S.groups[k]=v;changed()})));
+  const su=$('#suits');su.innerHTML='';SUITS.forEach(s=>su.append(chip('suit-'+s.id,S.naming==='rws'?s.rws:(S.naming==='both'&&s.id==='disks'?'Disks/Pentacles':s.thoth),S.suits[s.id],v=>{S.suits[s.id]=v;changed()})));
+  const sc=$('#showChips');sc.innerHTML='';FIELDS.forEach(([k])=>{if(k==='other'&&S.naming==='both')return;sc.append(chip('show-'+k,labelOf(k),S.show[k],v=>{S.show[k]=v;save();buildSide();renderSpread()}))});
+  $('#hiddenMode').value=S.hiddenMode;
+  const qf=$('#quizFields');qf.innerHTML='';[...QFIELDS,'patterns'].forEach(k=>{if(k==='other'&&S.naming==='both')return;qf.append(chip('qf-'+k,labelOf(k),S.qf[k],v=>{S.qf[k]=v;save();resetQuiz()}))});
+  $('#dir-'+S.dir).checked=true;$('#ans-'+S.ans).checked=true;$('#src-'+S.src).checked=true;$('#qm-'+S.mode).checked=true;
+  $('#mk-'+S.mapKind).checked=true;$('#mm-'+S.mapMode).checked=true;
+  $('#poolCount').textContent=pool().length+' of 78';
+  $('#sumDetail').textContent={thoth:'Thoth',rws:'RWS',both:'Thoth+RWS'}[S.naming]+' · '+pool().length+' cards';
+  const shown=FIELDS.filter(([k])=>S.show[k]&&!(k==='other'&&S.naming==='both')).map(([k])=>labelOf(k));
+  $('#dispSum').textContent=(shown.join(', ')||'nothing shown')+(S.hiddenMode==='reveal'?' · others tap to reveal':'');
+  const fs=activeFields();$('#qoptsSum').textContent=(fs.map(labelOf).join(', ')+(S.qf.patterns?(fs.length?', ':'')+'patterns':''))||'nothing selected';
+}
+$$('input[name=naming]').forEach(r=>r.addEventListener('change',e=>{S.naming=e.target.value;save();buildSide();renderSpread();renderRef();resetQuiz();renderMap();buildMatchFields();newMatch();renderProgress()}));
+$('#hiddenMode').addEventListener('change',e=>{S.hiddenMode=e.target.value;save();buildSide();renderSpread()});
+$$('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.preset;
+  const set=(m,a,n,c)=>S.groups={major:!!m,ace:!!a,number:!!n,court:!!c};
+  if(p==='all')set(1,1,1,1);if(p==='major')set(1,0,0,0);if(p==='minor')set(0,1,1,1);if(p==='pips')set(0,1,1,0);if(p==='court')set(0,0,0,1);
+  if(p!=='major')SUITS.forEach(s=>S.suits[s.id]=true);
+  changed();}));
+function changed(){save();buildSide();renderRef();draw();resetQuiz();buildMatchFields();newMatch();renderProgress();if(S.mapMode==='find')newMapQ()}
+
+/* ---------- tabs ---------- */
+let TAB='spread';
+function showTab(t){TAB=t;$$('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  ['spread','quiz','maps','match','progress','ref'].forEach(x=>$('#tab-'+x).hidden=x!==t);
+  if(t==='progress')renderProgress(); if(t==='maps')renderMap();}
+$$('#tabs button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+
+/* ---------- spread ---------- */
+const SPREADS=[[1,'1'],[3,'3'],[4,'4'],[5,'5'],[7,'7'],[10,'10 · Celtic Cross']];
+SPREADS.forEach(([n,l])=>{const lab=document.createElement('label');lab.innerHTML='<input type="radio" name="spreadN" id="sp-'+n+'" value="'+n+'"><span>'+l+'</span>';
+  lab.querySelector('input').addEventListener('change',()=>{S.spreadN=n;$('#customN').hidden=true;save();draw()});$('#spreadSeg').append(lab)});
+{const lab=document.createElement('label');lab.innerHTML='<input type="radio" name="spreadN" id="sp-other" value="other"><span>Other</span>';
+  lab.querySelector('input').addEventListener('change',()=>{const ci=$('#customN');ci.hidden=false;ci.value=S.spreadN;ci.focus()});$('#spreadSeg').append(lab)}
+function syncSpreadSeg(){const preset=SPREADS.some(([n])=>n===S.spreadN);
+  $$('input[name=spreadN]').forEach(i=>i.checked=i.value==='other'?!preset:+i.value===S.spreadN);
+  $('#customN').hidden=preset;$('#customN').value=S.spreadN;$('#reversals').checked=S.reversals}
+$('#customN').addEventListener('change',e=>{let n=Math.max(1,Math.min(22,parseInt(e.target.value)||1));S.spreadN=n;syncSpreadSeg();save();draw()});
+$('#reversals').addEventListener('change',e=>{S.reversals=e.target.checked;save();draw()});
+let SPREAD=[],REVEALED=new Set();
+function draw(){const p=pool();const n=Math.min(S.spreadN,p.length);
+  SPREAD=shuffle(p).slice(0,n).map(c=>({id:c.id,rev:S.reversals&&Math.random()<.5}));REVEALED=new Set();renderSpread();}
+function renderSpread(){
+  const box=$('#spread');const p=pool();
+  $('#spreadNote').textContent=!p.length?'':(S.spreadN>p.length?'Only '+p.length+' cards in the pool, so the spread is shorter than '+S.spreadN+'.':'');
+  if(!p.length){box.innerHTML='<div class="empty">No cards match the deck setting. Turn on a group or suit in the deck settings.</div>';return}
+  box.innerHTML=SPREAD.map((s,i)=>{const c=BYID[s.id];
+    const showEl=S.show.element||REVEALED.has(i+'|element');
+    const[a,b]=names(c);const nameShown=S.show.name||REVEALED.has(i+'|name');
+    let h='<article class="tcard '+(showEl?elClass(c):'')+'"><div class="band"></div><div class="tc-body">';
+    h+='<div class="tc-top"><span>Position '+(i+1)+'</span>'+(s.rev?'<span class="rev">Reversed</span>':'')+'</div>';
+    h+=nameShown?'<h3 class="tc-name'+(!S.show.name?' shown-late':'')+'">'+esc(a)+(b?'<span class="tc-alt">RWS: '+esc(b)+'</span>':'')+'</h3>':'<button class="mask big" data-r="'+i+'|name">Reveal name</button>';
+    h+='<dl class="facts">';
+    FIELDS.forEach(([k])=>{if(k==='name')return;const v=val(c,k);if(v==null)return;const key=i+'|'+k;
+      if(S.show[k])h+='<dt>'+esc(labelOf(k))+'</dt><dd>'+deco(k,v)+'</dd>';
+      else if(S.hiddenMode==='reveal'){h+='<dt>'+esc(labelOf(k))+'</dt>';
+        h+=REVEALED.has(key)?'<dd class="shown-late">'+deco(k,v)+'</dd>':'<dd><button class="mask" data-r="'+key+'">reveal</button></dd>';}});
+    return h+'</dl></div></article>';}).join('');
+}
+$('#spread').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b)return;REVEALED.add(b.dataset.r);renderSpread()});
+$('#draw').addEventListener('click',draw);
+$('#revealAll').addEventListener('click',()=>{SPREAD.forEach((s,i)=>FIELDS.forEach(([k])=>REVEALED.add(i+'|'+k)));renderSpread()});
+$('#quizSpread').addEventListener('click',()=>{S.src='spread';if(S.mode==='daily'||S.mode==='speed')S.mode='smart';save();buildSide();showTab('quiz');resetQuiz()});
+
+/* ---------- answer matching ---------- */
+const norm=s=>String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+  .replace(/\bpentacles?\b/g,'disks').replace(/\bdisk\b/g,'disks')
+  .replace(/\b(10|[1-9])\b/g,d=>WORD[+d].toLowerCase()).replace(/\bthe\b/g,'').replace(/[^a-z0-9]/g,'');
+const lev=(a,b)=>{const m=a.length,n=b.length;const d=Array.from({length:m+1},(_,i)=>{const r=new Array(n+1).fill(0);r[0]=i;return r});
+  for(let j=0;j<=n;j++)d[0][j]=j;
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++){const cost=a[i-1]===b[j-1]?0:1;
+    d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+cost);
+    if(i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1])d[i][j]=Math.min(d[i][j],d[i-2][j-2]+1);}
+  return d[m][n]};
+const tol=n=>n<=3?0:n<=8?1:2;
+const close=(a,b)=>!!a&&!!b&&(a===b||(Math.abs(a.length-b.length)<=2&&lev(a,b)<=tol(Math.min(a.length,b.length))));
+const normVal=s=>norm(String(s).replace(/^\s*(the\s+)?(lord|lady)\s+of\s+(the\s+)?/i,''));
+const RANK_W={ace:1,aces:1,one:1,'1':1,i:1,two:2,'2':2,ii:2,deuce:2,three:3,'3':3,iii:3,four:4,'4':4,iv:4,five:5,'5':5,v:5,six:6,'6':6,vi:6,seven:7,'7':7,vii:7,eight:8,'8':8,viii:8,nine:9,'9':9,ix:9,ten:10,'10':10,x:10};
+const COURT_W=['king','queen','knight','prince','princess','page'];
+const SUIT_W={wands:'wands',wand:'wands',rods:'wands',rod:'wands',batons:'wands',baton:'wands',staves:'wands',staff:'wands',staffs:'wands',
+  cups:'cups',cup:'cups',chalices:'cups',chalice:'cups',swords:'swords',sword:'swords',blades:'swords',
+  disks:'disks',disk:'disks',discs:'disks',disc:'disks',pentacles:'disks',pentacle:'disks',coins:'disks',coin:'disks',pents:'disks'};
+const MAJ_ALIAS={M0:['fool'],M1:['magus','magician'],M2:['priestess','high priestess'],M3:['empress'],M4:['emperor'],M5:['hierophant'],M6:['lovers','lover'],M7:['chariot'],
+  M8:['adjustment','justice'],M9:['hermit'],M10:['fortune','wheel','wheel of fortune'],M11:['lust','strength'],M12:['hanged man','hanging man'],M13:['death'],
+  M14:['art','temperance'],M15:['devil'],M16:['tower'],M17:['star'],M18:['moon'],M19:['sun'],M20:['aeon','aion','judgement','judgment'],M21:['universe','world']};
+function fuzzyKey(w,keys){if(keys.includes(w))return w;for(const k of keys){if(k.length>=4&&close(w,k))return k}return null}
+function parseCard(inp){
+  const out=new Set();
+  const toks=inp.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim().split(' ')
+    .filter(t=>t&&!['the','of','card','a','in'].includes(t));
+  let rank=null,court=null,suit=null;
+  for(const t of toks){
+    const sk=fuzzyKey(t,Object.keys(SUIT_W));if(sk&&!suit){suit=SUIT_W[sk];continue}
+    const ck=fuzzyKey(t,COURT_W)||fuzzyKey(t.replace(/s$/,''),COURT_W);if(ck&&!court){court=ck;continue}
+    if(RANK_W[t]&&!rank){rank=RANK_W[t];continue}
+    const rk=fuzzyKey(t,Object.keys(RANK_W).filter(k=>k.length>3));if(rk&&!rank)rank=RANK_W[rk];
+  }
+  if(suit&&court){const sys=S.naming;const ranks=[];
+    if(court==='king')ranks.push('Knight');if(court==='queen')ranks.push('Queen');
+    if(court==='prince')ranks.push('Prince');if(court==='princess'||court==='page')ranks.push('Princess');
+    if(court==='knight'){if(sys!=='rws')ranks.push('Knight');if(sys!=='thoth')ranks.push('Prince')}
+    ranks.forEach(r=>out.add(suit+r));return out;}
+  if(suit&&rank){out.add(suit+rank);return out}
+  const joined=toks.join('');
+  for(const id in MAJ_ALIAS){if(MAJ_ALIAS[id].some(a=>close(a.replace(/ /g,''),joined)))out.add(id)}
+  const numTok=toks.filter(t=>t!=='atu');
+  if(!out.size&&numTok.length===1){const t=numTok[0];const n=/^[ivxl]+$/.test(t)?unroman(t):/^\d+$/.test(t)?+t:(t==='zero'?0:null);
+    if(n!=null)CARDS.filter(c=>c.group==='major'&&((S.naming!=='rws'&&c.tn===n)||(S.naming!=='thoth'&&c.rn===n))).forEach(c=>out.add(c.id));}
+  return out;
+}
+function acceptedFor(c,k){
+  const v=val(c,k);let acc=[v];
+  if(k==='number'&&c.group==='major'){const nums=S.naming==='rws'?[c.rn]:S.naming==='thoth'?[c.tn]:[c.tn,c.rn];return{nums}}
+  if(k==='hebrew'){const keys=S.naming==='rws'?[c.hebR]:S.naming==='thoth'?[c.heb]:[c.heb,c.hebR];acc=[];const glyphs=[];keys.forEach(x=>{acc.push(HEB[x][0],...HEB[x][2]);glyphs.push(HEB[x][1])});return{acc,glyphs}}
+  if(k==='other')return{cardAnswer:true};
+  if(k==='element'&&c.group==='court'){const[a,b]=c.element.split(' of ');acc=[c.element,a+' '+b,a.charAt(0)+' of '+b,'fiery watery airy earthy'.split(' ')[['Fire','Water','Air','Earth'].indexOf(a)]+' '+b];}
+  if(k==='planet'&&c.group==='number')acc=[v,v+' in '+c.sign];
+  if(k==='sephirah')acc=[v,...(SEPH_ALT[v]||[])];
+  if(k==='element'&&c.id==='M20')acc=['Fire','Spirit','Fire and Spirit'];
+  if(k==='number'&&c.group==='ace')acc=['Ace','1','one'];
+  return{acc};
+}
+const TYPEABLE=k=>!['esoteric','dates'].includes(k);
+
+/* ---------- question builders ---------- */
+const GROUP_NOUN={major:'trump',ace:'ace',number:'small card',court:'court card'};
+const activeFields=()=>QFIELDS.filter(k=>S.qf[k]&&!(k==='other'&&S.naming==='both'));
+function cardToFact(c,k){
+  const v=val(c,k);if(v==null)return null;
+  const nm=nameStr(c);if(norm(nm).includes(norm(v)))return null;
+  const sameGroup=CARDS.filter(x=>x.group===c.group);
+  let pool2=[...new Set(sameGroup.map(x=>val(x,k)).filter(x=>x!=null&&x!==v))];
+  if(pool2.length<3)pool2=[...new Set(CARDS.map(x=>val(x,k)).filter(x=>x!=null&&x!==v))];
+  if(!pool2.length)return null;
+  const N='<strong>'+esc(nm)+'</strong>';
+  const P={number:'What number is '+N+'?',element:'What is the element of '+N+'?',
+    planet:c.group==='number'?'Which planet rules the decan of '+N+'?':'Which planet is '+N+' attributed to?',
+    sign:c.group==='number'?'Which sign holds the decan of '+N+'?':c.group==='court'?'Which part of the zodiac does '+N+' rule?':'Which sign is '+N+' attributed to?',
+    title:'What is the Thoth title of '+N+'?',hebrew:'Which Hebrew letter belongs to '+N+'?',sephirah:'Which Sephirah is '+N+' placed in?',
+    dates:'Which dates does '+N+' cover?',esoteric:'What is the esoteric title of '+N+'?',other:'What is '+N+' called in the '+(S.naming==='rws'?'Thoth':'RWS')+' deck?'}[k];
+  const opts=shuffle([{h:deco(k,v),ok:true},...shuffle(pool2).slice(0,3).map(x=>({h:deco(k,x),ok:false}))]);
+  return{id:c.id,k,key:c.id+'|'+k,dir:'cf',eyebrow:labelOf(k),prompt:P,opts,answerH:deco(k,v),typeable:TYPEABLE(k)&&!(k==='sign'&&c.group==='court'),...acceptedFor(c,k)};
+}
+function factToCard(c,k){
+  let key=k,v;
+  if(c.group==='number'&&(k==='planet'||k==='sign')){key='decan';v=c.planet+' in '+c.sign;}
+  else{v=val(c,k);if(v==null||k==='element'||k==='sephirah')return null;}
+  const same=CARDS.filter(x=>x.group===c.group);
+  const vOf=x=>key==='decan'?x.planet+' in '+x.sign:val(x,k);
+  if(same.filter(x=>vOf(x)===v).length!==1)return null;
+  const D=deco(key,v),noun=GROUP_NOUN[c.group];
+  const phrase={decan:'Which card is <strong>'+D+'</strong>?',title:'Which '+noun+' carries the Thoth title <strong>'+D+'</strong>?',
+    esoteric:'Which card is “<strong>'+D+'</strong>”?',hebrew:'Which trump is attributed to the letter <strong>'+D+'</strong>?',
+    number:'Which trump is numbered <strong>'+D+'</strong>?',dates:'Which card covers <strong>'+D+'</strong>?',
+    planet:'Which trump is attributed to <strong>'+D+'</strong>?',sign:c.group==='court'?'Which court card rules <strong>'+D+'</strong>?':'Which trump is attributed to <strong>'+D+'</strong>?',
+    other:'Which card is called <strong>'+D+'</strong> in the '+(S.naming==='rws'?'Thoth':'RWS')+' deck?'}[key];
+  if(!phrase)return null;
+  const cand=same.filter(x=>x.id!==c.id).map(x=>({x,s:(x.sign&&x.sign===c.sign?2:0)+(x.planet&&x.planet===c.planet?1:0)+(x.suit&&x.suit===c.suit?1:0)+Math.random()*1.5}))
+    .sort((a,b)=>b.s-a.s).slice(0,6).map(o=>o.x);
+  const opts=shuffle([{h:esc(nameStr(c)),ok:true},...shuffle(cand).slice(0,3).map(x=>({h:esc(nameStr(x)),ok:false}))]);
+  const sys=S.naming==='both'?['thoth','rws']:[S.naming];
+  return{id:c.id,k,key:c.id+'|'+k,dir:'fc',eyebrow:key==='decan'?'Decan':labelOf(k),prompt:phrase,opts,answerH:esc(nameStr(c)),typeable:true,cardAnswer:true,acc:sys.map(s=>nameIn(c,s))};
+}
+const build=(c,k,dir)=>dir==='cf'?cardToFact(c,k):factToCard(c,k);
+
+/* pattern questions: they teach the system rather than single facts */
+function patQ(src){
+  const nums=src.filter(c=>c.group==='number'),majs=src.filter(c=>c.group==='major'),crts=src.filter(c=>c.group==='court');
+  const makers=[];
+  const numSrc=nums.length?nums:(src.some(c=>c.group==='ace'||c.group==='court')?NUMBERED:[]);
+  if(numSrc.length)makers.push(()=>patNextPlanet(pick(numSrc)),()=>patNextCard(pick(numSrc)),()=>patTriad(pick(numSrc).sign),()=>patOdd(numSrc,'planet'),()=>patOdd(numSrc,'sephirah'));
+  if(numSrc.length&&(crts.length||!majs.length))makers.push(()=>patCourtDecan(pick(numSrc)));
+  if(majs.length)makers.push(()=>patOddMajor(),()=>patLetterType(pick(majs)));
+  if(!makers.length)return null;
+  for(let i=0;i<8;i++){const q=pick(makers)();if(q)return q}
+  return null;
+}
+const mkPat=(eyebrow,prompt,correctH,wrongHs,whyH)=>({id:'pattern',k:'patterns',dir:'pt',eyebrow,prompt,typeable:false,answerH:correctH,whyH,
+  opts:shuffle([{h:correctH,ok:true},...wrongHs.slice(0,3).map(h=>({h,ok:false}))])});
+function patNextPlanet(c){
+  const nx=BYDEC[(c.dec+1)%36];
+  return mkPat('Pattern · decan order','Which planet rules the decan after <strong>'+deco('decan',c.planet+' in '+c.sign)+'</strong>?',deco('planet',nx.planet),
+    shuffle(CHALDEAN.filter(p=>p!==nx.planet&&p!==c.planet)).map(p=>deco('planet',p)),
+    'Decan planets follow the Chaldean order, Saturn → Jupiter → Mars → Sun → Venus → Mercury → Moon, then repeat. After '+c.planet+' comes '+B(nx.planet)+', on '+esc(shortName(nx))+' ('+deco('decan',nx.planet+' in '+nx.sign)+').');
+}
+function patNextCard(c){
+  const nx=BYDEC[(c.dec+1)%36];
+  const wrong=[BYDEC[(c.dec+2)%36],BYDEC[(c.dec+35)%36],...NUMBERED.filter(x=>x.n===nx.n&&x.id!==nx.id)].filter(x=>x.id!==c.id);
+  return mkPat('Pattern · around the zodiac','Which card comes after <strong>'+esc(shortName(c))+'</strong> going around the zodiac?',esc(shortName(nx)),
+    shuffle([...new Map(wrong.map(x=>[x.id,x])).values()]).map(x=>esc(shortName(x))),
+    'Each sign holds three decans in order. '+esc(shortName(c))+' is the '+ORD[c.dec%3]+' decan of '+c.sign+', so next is '+(c.dec%3===2?'the first decan of the next sign, ':'')+B(esc(shortName(nx)))+' ('+deco('decan',nx.planet+' in '+nx.sign)+').');
+}
+const triadOf=sign=>NUMBERED.filter(x=>x.sign===sign).sort((a,b)=>a.n-b.n);
+const triadH=sign=>{const t=triadOf(sign);return t.map(x=>WORD[x.n]).join(', ')+' of '+suitLabel(t[0].suit)};
+function patTriad(sign){
+  const si=SIGNS.indexOf(sign);
+  const sameEl=SIGNS.filter((g,i)=>SIGN_EL[g]===SIGN_EL[sign]&&g!==sign),sameMod=SIGNS.filter((g,i)=>i%3===si%3&&g!==sign);
+  const wrong=shuffle(sameEl).concat(shuffle(sameMod)).slice(0,3).map(triadH);
+  return mkPat('Pattern · signs','Which three cards make up <strong>'+deco('sign',sign)+'</strong>?',esc(triadH(sign)),wrong.map(esc),
+    sign+' is the '+MODS[si%3]+' '+SIGN_EL[sign]+' sign. '+SIGN_EL[sign]+' signs live in '+suitLabel(SUIT_OF_EL[SIGN_EL[sign]])+', and '+MODS[si%3]+' signs take '+BASE[si%3]+'–'+(BASE[si%3]+2)+'.');
+}
+function patOdd(numSrc,prop){
+  const anchor=pick(numSrc);const v=anchor[prop];
+  let univ=NUMBERED.slice();
+  const groupP=univ.filter(x=>x[prop]===v);if(groupP.length<3)return null;
+  const three=shuffle(groupP).slice(0,3);
+  const others=univ.filter(x=>x[prop]!==v);
+  const odd=pick(others.filter(x=>three.some(t=>t.suit===x.suit))||others)||pick(others);
+  const descr=prop==='planet'?'ruled by '+deco('planet',v):'in '+v+' (the '+WORD[anchor.n].toLowerCase()+'s)';
+  return mkPat('Pattern · odd one out','Which one doesn’t belong?',esc(shortName(odd)),three.map(x=>esc(shortName(x))),
+    'The other three are all '+descr+'. '+esc(shortName(odd))+' is '+(prop==='planet'?deco('planet',odd.planet)+' in '+deco('sign',odd.sign):'in '+odd.sephirah)+'.');
+}
+function patOddMajor(){
+  const kinds={el:'mother-letter (elemental) trumps',pl:'double-letter (planetary) trumps',zo:'simple-letter (zodiac) trumps'};
+  const kind=pick(['el','pl','zo']);const ms=CARDS.filter(c=>c.group==='major');
+  const three=shuffle(ms.filter(c=>c.kind===kind)).slice(0,3),odd=pick(ms.filter(c=>c.kind!==kind));
+  return mkPat('Pattern · odd one out','Which one doesn’t belong?',esc(shortName(odd)),three.map(x=>esc(shortName(x))),
+    'The other three are all '+kinds[kind]+'. '+esc(shortName(odd))+' carries '+deco('any',odd.attr)+'.');
+}
+function patLetterType(c){
+  const key=hebKeyOf(c),t=letterType(key);const all=['Mother letter → an element','Double letter → a planet','Simple letter → a sign'];
+  const ok=all[['mother','double','simple'].indexOf(t)];
+  return mkPat('Pattern · letter types','What kind of letter does <strong>'+esc(shortName(c))+'</strong> carry, and what does that give it?',ok,all.filter(x=>x!==ok),
+    shortName(c)+' carries '+hebH(key)+', a '+t+' letter, so it takes '+deco('any',c.attr)+'. There are 3 mother letters, 7 double and 12 simple.');
+}
+function patCourtDecan(c){
+  const cs=CARDS.filter(x=>x.group==='court'&&x.rank.t!=='Princess');
+  const ans=cs.find(x=>x.decs.includes(c.dec));if(!ans)return null;
+  const wrong=shuffle(cs.filter(x=>x.id!==ans.id).map(x=>({x,s:(x.suit===ans.suit?1:0)+(SUIT[x.suit].el===SIGN_EL[c.sign]?1:0)+Math.random()}))).sort((a,b)=>b.s-a.s).slice(0,3).map(o=>esc(shortName(o.x)));
+  return mkPat('Pattern · courts','Which court card rules the decan of <strong>'+esc(shortName(c))+'</strong> ('+deco('decan',c.planet+' in '+c.sign)+')?',esc(shortName(ans)),wrong,
+    esc(shortName(ans))+' rules '+deco('sign',ans.sign)+', covering '+decanCardsH(ans.decs)+'.');
+}
+
+/* ---------- quiz state ---------- */
+const QS={count:0,recentKeys:[],recentIds:[],again:{},right:0,total:0,streak:0,daily:null,speed:null,forced:null};
+const MISSED=new Map();
+let Q=null,answered=false,pendingGrade=null,hintUsed=false;
+let VALID={key:'',items:[]};
+function sourceCards(){
+  if(S.mode==='daily')return pool();
+  if(S.src==='spread')return SPREAD.map(s=>BYID[s.id]);
+  if(S.src==='missed')return[...new Set([...MISSED.values()].map(m=>m.id))].map(id=>BYID[id]);
+  return pool();
+}
+function validItems(src,fields){
+  const key=JSON.stringify([S.mode==='daily'?'pool':S.src,S.dir,S.naming,fields,src.map(c=>c.id).sort(),S.src==='missed'&&S.mode!=='daily'?[...MISSED.keys()].sort():0]);
+  if(VALID.key===key)return VALID.items;
+  const items=[];
+  src.forEach(c=>fields.forEach(k=>{const dirs=(S.dir==='mix'?['cf','fc']:[S.dir]).filter(d=>build(c,k,d));if(dirs.length)items.push({id:c.id,k,key:c.id+'|'+k,dirs})}));
+  const out=S.src==='missed'&&S.mode!=='daily'?items.filter(it=>MISSED.has(it.key)):items;
+  VALID={key,items:out};return out;
+}
+function grade(key,outcome){
+  if(!key)return;
+  const now=Date.now();const st=P.srs[key]||{b:0,due:0,n:0,r:0,t:0};
+  let b=st.b||0;
+  const early=st.due>now&&st.b>0; // reviewing ahead of schedule doesn't move an item up
+  let due;
+  if(outcome==='knew'){if(!early)b=b===0?2:Math.min(6,b+1);due=early?st.due:now+INTERVALS[b]}
+  else if(outcome==='hinted'){b=Math.max(1,b);due=early?st.due:now+INTERVALS[b]}
+  else{b=1;QS.again[key]=QS.count+4;due=now+INTERVALS[1]}
+  P.srs[key]={b,due,n:(st.n||0)+1,r:(st.r||0)+(outcome==='wrong'?0:1),t:now};
+  saveP();
+}
+/* Smart review: overdue and weak items first, then new ones, then whatever is due soonest. */
+function smartItem(src,fields){
+  const items=validItems(src,fields);if(!items.length)return null;
+  const now=Date.now();
+  const fresh=items.filter(it=>!QS.recentKeys.slice(-4).includes(it.key)&&!QS.recentIds.slice(-2).includes(it.id));
+  const list=fresh.length?fresh:items;
+  const rank=it=>{const st=P.srs[it.key];
+    if(QS.again[it.key]!=null&&QS.again[it.key]<=QS.count)return[0,QS.again[it.key]];
+    if(st&&st.due<=now)return[1,st.b*1e13+st.due];
+    if(!st)return[2,Math.random()];
+    return[3,st.due];};
+  const scored=list.map(it=>({it,r:rank(it)})).sort((a,b)=>a.r[0]-b.r[0]||a.r[1]-b.r[1]);
+  const top=scored.filter(s=>s.r[0]===scored[0].r[0]).slice(0,3);
+  return pick(top).it;
+}
+let DECK=[],DECK_KEY='',ROUND={n:0,size:0,done:0};
+function roundItem(src,fields){
+  const items=validItems(src,fields);if(!items.length)return null;
+  if(VALID.key!==DECK_KEY||!DECK.length){
+    if(VALID.key!==DECK_KEY)ROUND.n=0;DECK_KEY=VALID.key;
+    let d=shuffle(items);
+    for(let i=0;i<d.length;i++){const clash=x=>(i>0&&d[i-1].id===x.id)||(i<3&&QS.recentIds.slice(-3).includes(x.id));
+      if(clash(d[i])){const j=d.findIndex((x,jj)=>jj>i&&!clash(x));if(j>0)[d[i],d[j]]=[d[j],d[i]]}}
+    DECK=d;ROUND={n:ROUND.n+1,size:d.length,done:0};
+  }
+  ROUND.done++;return DECK.shift();
+}
+function makeQ(){
+  if(QS.forced){const f=QS.forced;QS.forced=null;const c=BYID[f.id];const dirs=['cf','fc'].filter(d=>build(c,f.k,d));if(dirs.length)return build(c,f.k,pick(dirs));}
+  const src=sourceCards();if(!src.length)return null;
+  const fields=activeFields();
+  const usePat=S.qf.patterns&&(!fields.length||Math.random()<.22);
+  if(usePat){const q=patQ(src);if(q)return q}
+  if(!fields.length)return null;
+  for(let t=0;t<6;t++){
+    const it=S.mode==='rounds'||S.mode==='speed'?roundItem(src,fields):smartItem(src,fields);
+    if(!it)return S.qf.patterns?patQ(src):null;
+    const q=build(BYID[it.id],it.k,pick(it.dirs));if(q)return q;
+  }
+  return null;
+}
+function resetQuiz(){VALID.key='';DECK_KEY='';DECK=[];QS.daily=null;stopSpeed();QS.speed=null;nextQ(true)}
+
+/* ---------- quiz flow ---------- */
+function nextQ(fresh){
+  if(pendingGrade){grade(pendingGrade,'knew');pendingGrade=null}
+  hintUsed=false;answered=false;
+  if(S.mode==='speed'&&!(QS.speed&&QS.speed.active)){Q=null;renderSpeedIntro();renderScore();return}
+  if(S.mode==='daily'){
+    if(!QS.daily)QS.daily={i:0,right:0,done:false,already:P.daily.last===todayStr()};
+    if(QS.daily.i>=10){finishDaily();return}
+  }
+  Q=makeQ();
+  if(Q){QS.count++;if(Q.key){QS.recentKeys.push(Q.key);QS.recentIds.push(Q.id)}if(QS.recentKeys.length>12){QS.recentKeys.shift();QS.recentIds.shift()}}
+  renderQ();renderScore();
+}
+function boxLabel(){if(!Q||!Q.key)return'';const st=P.srs[Q.key];if(!st)return'new';return['new','learning','box 2','box 3','box 4','box 5','mastered'][st.b]||''}
+function renderQ(){
+  const box=$('#qcard');
+  if(!Q){
+    const why=!sourceCards().length?(S.src==='spread'?'Draw a spread first.':S.src==='missed'?'Nothing missed yet today. Switch “Cards from” back to Deck setting.':'No cards match the deck setting.'):'No questions fit these settings. Open Quiz settings and add a topic.';
+    box.innerHTML='<p class="q-eyebrow">Quiz</p><p class="q-prompt">'+why+'</p>';return}
+  const typed=S.ans==='type'&&Q.typeable&&S.mode!=='speed';
+  let h='<div class="q-eyebrow"><span>'+esc(Q.eyebrow)+(Q.dir==='fc'?' → card':'')+'</span><span class="box">'+boxLabel()+'</span></div>';
+  if(S.mode==='daily')h+='<div class="bar" aria-label="Daily progress"><i style="width:'+(QS.daily.i*10)+'%"></i></div>';
+  if(S.mode==='speed')h+='<div class="bar"><i id="speedBar" style="width:100%"></i></div>';
+  h+='<p class="q-prompt">'+Q.prompt+'</p>';
+  if(typed)h+='<form class="typed" id="typedForm"><input id="typedIn" autocomplete="off" autocapitalize="off" placeholder="Type your answer" aria-label="Your answer"><button class="btn primary" type="submit">Check</button></form>';
+  else h+='<div class="opts">'+Q.opts.map((o,i)=>'<button class="opt" data-i="'+i+'"><span class="k">'+(i+1)+'</span><span>'+o.h+'</span></button>').join('')+'</div>';
+  if(S.ans==='type'&&!Q.typeable&&S.mode!=='speed')h+='<span class="hint">Multiple choice for this one.</span>';
+  h+='<div id="hintSlot"></div><div class="fb" id="fb" aria-live="polite"></div><div id="whySlot"></div>';
+  h+='<div class="q-foot"><span class="hint keys">'+(S.mode==='speed'?'Keys 1–4':'1–4 answer · H hint · Enter next · G guessed')+'</span><div class="acts" id="acts">';
+  if(S.mode!=='speed'&&Q.dir!=='pt')h+='<button class="btn quiet" id="hintBtn">Hint</button>';
+  if(typed)h+='<button class="btn quiet" id="skipBtn">Show answer</button>';
+  h+='</div></div>';
+  box.innerHTML=h;box.className='qcard';
+  $('#hintBtn')?.addEventListener('click',showHint);
+  if(typed){$('#typedForm').addEventListener('submit',e=>{e.preventDefault();if(answered){nextQ();return}gradeTyped($('#typedIn').value)});
+    $('#skipBtn').addEventListener('click',()=>{if(!answered)finish(false)});$('#typedIn').focus({preventScroll:true});}
+  else box.querySelectorAll('.opt').forEach(b=>b.addEventListener('click',()=>choose(+b.dataset.i)));
+}
+function showHint(){if(answered||!Q||Q.dir==='pt')return;hintUsed=true;$('#hintSlot').innerHTML='<div class="hintbox">'+hint(BYID[Q.id],Q.k,Q.dir)+'</div>';$('#hintBtn')?.remove()}
+function choose(i){if(answered||!Q)return;const ok=Q.opts[i].ok;
+  $$('#qcard .opt').forEach((b,j)=>{b.disabled=true;if(Q.opts[j].ok)b.classList.add('right');else if(j===i)b.classList.add('wrong')});finish(ok)}
+function gradeTyped(inp){if(!inp.trim())return;let ok=false;const s=inp.trim();
+  if(Q.cardAnswer){ok=parseCard(s).has(Q.id)}
+  else if(Q.nums){const t=s.toLowerCase().replace(/^atu\s*/,'');const n=/^[ivxl]+$/.test(t)?unroman(t):t==='zero'?0:parseInt(t,10);ok=Q.nums.includes(n)}
+  else ok=(Q.glyphs||[]).includes(s)||Q.acc.some(a=>close(normVal(a),normVal(s)));
+  $('#typedIn').readOnly=true;finish(ok)}
+function finish(ok){
+  answered=true;QS.total++;P.stats.n++;if(ok){QS.right++;QS.streak++;P.stats.r++}else QS.streak=0;
+  if(S.mode==='speed'){QS.speed.total++;if(ok)QS.speed.score++;saveP();renderScore();setTimeout(()=>{if(QS.speed&&QS.speed.active)nextQ()},ok?260:900);return}
+  if(S.mode==='daily'){QS.daily.i++;if(ok)QS.daily.right++}
+  const fb=$('#fb');fb.className='fb '+(ok?'ok':'no');fb.innerHTML=ok?'Correct.':'Not this time. The answer is '+Q.answerH+'.';
+  const whyH=Q.dir==='pt'?Q.whyH:explain(BYID[Q.id]);
+  const elc=Q.dir==='pt'?'el-spirit':elClass(BYID[Q.id]);
+  $('#qcard').className='qcard '+elc;
+  $('#whySlot').innerHTML='<div class="why '+elc+'">'+whyH+'</div>';
+  const acts=$('#acts');acts.innerHTML='';
+  const nextLbl=S.mode==='daily'&&QS.daily.i>=10?'See results':'Next';
+  if(Q.key){
+    const mk=Q.key;
+    if(ok&&!hintUsed){pendingGrade=Q.key;
+      acts.innerHTML='<button class="btn" id="gGuess">Guessed</button><button class="btn primary" id="gKnew">Knew it · '+nextLbl+'</button>';
+      $('#gGuess').addEventListener('click',()=>{pendingGrade=null;grade(mk,'guessed');MISSED.set(mk,{id:Q.id,k:Q.k});nextQ()});
+      $('#gKnew').addEventListener('click',()=>nextQ());
+    }else{
+      grade(mk,ok?'hinted':'wrong');if(!ok)MISSED.set(mk,{id:Q.id,k:Q.k});else MISSED.delete(mk);
+      acts.innerHTML='<button class="btn primary" id="gNext">'+nextLbl+'</button>';$('#gNext').addEventListener('click',()=>nextQ());
+    }
+    if(ok&&!hintUsed)MISSED.delete(mk);
+  }else{saveP();acts.innerHTML='<button class="btn primary" id="gNext">'+nextLbl+'</button>';$('#gNext').addEventListener('click',()=>nextQ())}
+  renderScore();renderMissed();
+}
+function finishDaily(){
+  const d=QS.daily;
+  if(!d.done){d.done=true;
+    if(P.daily.last!==todayStr()){P.daily.streak=P.daily.last===yesterdayStr()?(P.daily.streak||0)+1:1;P.daily.last=todayStr();P.daily.best=Math.max(P.daily.best||0,P.daily.streak)}
+    P.daily.lastScore=d.right;saveP();}
+  Q=null;$('#qcard').className='qcard';
+  $('#qcard').innerHTML='<div class="summary"><span class="q-eyebrow">Daily ten · '+todayStr()+'</span><span class="big-num">'+d.right+' / 10</span>'+
+   '<p class="q-prompt" style="font-size:1.2rem">Day streak: '+P.daily.streak+(P.daily.streak===1?' day':' days')+'. Best: '+P.daily.best+'.</p>'+
+   (()=>{const le=lastExport();return(!le||Date.now()-le.t>7*DAY)?'<p class="hint" style="margin:0">'+(le?'Your last progress file is from '+daysAgo(le.t)+'.':'You haven\u2019t saved a progress file yet.')+' You can save one from the Progress tab.</p>':''})()+
+   '<div class="acts" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="dAgain">Another ten</button><button class="btn primary" id="dSmart">Keep going in Smart review</button></div></div>';
+  $('#dAgain').addEventListener('click',()=>{QS.daily=null;nextQ()});
+  $('#dSmart').addEventListener('click',()=>{S.mode='smart';save();buildSide();QS.daily=null;nextQ()});
+  renderScore();
+}
+/* speed round */
+let speedTick=null;
+function stopSpeed(){clearInterval(speedTick);speedTick=null;if(QS.speed)QS.speed.active=false}
+function renderSpeedIntro(){
+  const last=QS.speed&&QS.speed.finished?QS.speed:null;
+  let h='<div class="summary"><span class="q-eyebrow">Speed round</span>';
+  if(last){const best=P.speed.best;h+='<span class="big-num">'+last.score+'</span><p class="q-prompt" style="font-size:1.2rem">correct in 60 seconds ('+last.total+' answered). '+(last.newBest?'New personal best.':'Personal best: '+best+'.')+'</p>'}
+  else h+='<p class="q-prompt" style="font-size:1.2rem">Answer as many as you can in 60 seconds. Multiple choice, no hints. Personal best: '+(P.speed.best||0)+'.</p>';
+  h+='<button class="btn primary" id="speedGo">'+(last?'Play again':'Start')+'</button></div>';
+  $('#qcard').className='qcard';$('#qcard').innerHTML=h;$('#speedGo').addEventListener('click',startSpeed);
+}
+function startSpeed(){
+  QS.speed={active:true,end:Date.now()+60000,score:0,total:0};VALID.key='';DECK=[];
+  speedTick=setInterval(()=>{const left=QS.speed.end-Date.now();const t=$('#speedTimer');
+    if(t){t.textContent=Math.max(0,Math.ceil(left/1000))+'s';t.classList.toggle('low',left<10000)}
+    const bar=$('#speedBar');if(bar)bar.style.width=Math.max(0,left/600)+'%';
+    if(left<=0){stopSpeed();const s=QS.speed;s.finished=true;s.newBest=s.score>(P.speed.best||0);if(s.newBest)P.speed.best=s.score;P.speed.last=s.score;saveP();Q=null;renderSpeedIntro();renderScore()}},150);
+  nextQ();
+}
+function renderScore(){
+  const el=$('#scoreBar');let h='';
+  const pill=(b,t,hot)=>'<span class="pill'+(hot?' hot':'')+'"><b>'+b+'</b>'+t+'</span>';
+  if(S.mode==='speed'&&QS.speed&&QS.speed.active)h='<span class="timer" id="speedTimer">60s</span>'+pill(QS.speed.score,'correct')+pill(QS.speed.total,'answered');
+  else{
+    h=pill(QS.right+'/'+QS.total,'right')+pill(QS.streak,'in a row',QS.streak>=5)+pill(P.daily.streak||0,'day streak');
+    if(S.mode==='smart'||S.mode==='daily')h+=pill(countDue(),'due');
+    if(S.mode==='rounds'&&ROUND.size)h+=pill(ROUND.done+'/'+ROUND.size,'round '+ROUND.n);
+    if(S.mode==='daily'&&QS.daily)h+=pill(Math.min(QS.daily.i+(answered?0:1),10)+'/10','today');
+  }
+  el.innerHTML=h;
+  $('#modeNote').textContent={smart:'Weak and overdue items first; strong ones come back less often.',rounds:'Every item once per round, in random order.',daily:'Ten due items a day keeps your day streak going.',speed:'60 seconds, as many as you can.'}[S.mode];
+}
+function countDue(){const src=S.mode==='daily'?pool():sourceCards();const items=validItems(src,activeFields());const now=Date.now();return items.filter(it=>P.srs[it.key]&&P.srs[it.key].due<=now).length}
+function renderMissed(){const box=$('#missedBox');if(!MISSED.size||S.mode==='speed'){box.innerHTML='';return}
+  box.innerHTML='<h2 class="sec">To review today</h2><ul>'+[...MISSED.values()].map(m=>'<li>'+esc(shortName(BYID[m.id]))+' <span>· '+esc(labelOf(m.k))+'</span></li>').join('')+'</ul><button class="btn" id="drillMissed">Drill these '+MISSED.size+'</button>';
+  $('#drillMissed').addEventListener('click',()=>{S.src='missed';if(S.mode!=='smart'&&S.mode!=='rounds')S.mode='smart';save();buildSide();resetQuiz()});}
+$$('input[name=dir]').forEach(r=>r.addEventListener('change',e=>{S.dir=e.target.value;save();resetQuiz()}));
+$$('input[name=ans]').forEach(r=>r.addEventListener('change',e=>{S.ans=e.target.value;save();nextQ()}));
+$$('input[name=src]').forEach(r=>r.addEventListener('change',e=>{S.src=e.target.value;save();resetQuiz()}));
+$$('input[name=qmode]').forEach(r=>r.addEventListener('change',e=>{S.mode=e.target.value;save();buildSide();resetQuiz();renderMissed()}));
+document.addEventListener('keydown',e=>{
+  if(TAB!=='quiz')return; if(e.target.tagName==='INPUT'&&e.target.type!=='radio'&&e.target.type!=='checkbox')return; if(e.target.tagName==='SELECT')return;
+  if(!Q){if(e.key==='Enter'&&S.mode==='speed'&&!(QS.speed&&QS.speed.active)){e.preventDefault();startSpeed()}return}
+  if(/^[1-4]$/.test(e.key)&&!answered&&$('#qcard .opt')){choose(+e.key-1)}
+  else if((e.key==='h'||e.key==='H')&&!answered)showHint();
+  else if((e.key==='g'||e.key==='G')&&answered&&$('#gGuess'))$('#gGuess').click();
+  else if(e.key==='Enter'&&answered&&S.mode!=='speed'&&e.target.tagName!=='BUTTON'){e.preventDefault();nextQ()}
+});
+
+/* ---------- maps: zodiac wheel and Tree of Life ---------- */
+const MAP={sel:null,q:null,score:0,total:0,span:null};
+const ang=deg=>(180+deg)*Math.PI/180;
+const pt=(r,deg)=>[+(r*Math.cos(ang(deg))).toFixed(2),+(-r*Math.sin(ang(deg))).toFixed(2)];
+function sector(r0,r1,d0,d1){const a=pt(r1,d0),b=pt(r1,d1),c=pt(r0,d1),d=pt(r0,d0);
+  return 'M'+a+' A'+r1+' '+r1+' 0 0 0 '+b+' L'+c+' A'+r0+' '+r0+' 0 0 1 '+d+'Z';}
+const suitAbbr=id=>({wands:'W',cups:'C',swords:'S',disks:S.naming==='rws'?'P':'D'})[id];
+const narrowMQ=window.matchMedia('(max-width:600px)');
+function wheelSVG(){
+  const nar=narrowMQ.matches,HUB=nar?74:98;
+  let h='<svg viewBox="-215 -215 430 430" role="img" aria-label="Zodiac wheel with 36 decans">';
+  SIGNS.forEach((g,i)=>{h+='<path class="sg '+SIGN_EL[g].toLowerCase()+'" data-sign="'+g+'" d="'+sector(160,200,i*30,i*30+30)+'"><title>'+g+'</title></path>';
+    const[x,y]=pt(180,i*30+15);h+='<text class="gl" x="'+x+'" y="'+(y+(nar?8:6))+'" text-anchor="middle" font-size="'+(nar?23:17)+'">'+SIGN_G[g]+VS+'</text>';});
+  for(let d=0;d<36;d++){const c=BYDEC[d];h+='<path class="dc" id="dc'+d+'" data-dec="'+d+'" d="'+sector(HUB,160,d*10,d*10+10)+'"><title>'+esc(shortName(c))+'</title></path>';
+    if(nar){const[x,y]=pt(140,d*10+5),[x2,y2]=pt(103,d*10+5);
+      h+='<text class="gl" x="'+x+'" y="'+(y+6.5)+'" text-anchor="middle" font-size="18">'+PLAN_G[c.planet]+VS+'</text>';
+      h+='<text class="sm" x="'+x2+'" y="'+(y2+5)+'" text-anchor="middle" font-size="14" font-weight="700">'+c.n+'</text>';}
+    else{const[x,y]=pt(142,d*10+5),[x2,y2]=pt(116,d*10+5);
+      h+='<text class="gl" x="'+x+'" y="'+(y+4.5)+'" text-anchor="middle" font-size="12.5">'+PLAN_G[c.planet]+VS+'</text>';
+      h+='<text class="sm" x="'+x2+'" y="'+(y2+3.5)+'" text-anchor="middle" font-size="9.5">'+c.n+suitAbbr(c.suit)+'</text>';}}
+  h+='<circle class="hub" r="'+HUB+'"/>';
+  h+='<g id="spanLayer"></g><g id="hubText"></g></svg>';
+  return h;
+}
+function paintWheel(){
+  for(let d=0;d<36;d++){const el=$('#dc'+d);if(el)el.setAttribute('class','dc')}
+  const L=$('#spanLayer');if(L)L.innerHTML='';
+  const st=MAP.paint||{};
+  (st.hl||[]).forEach(d=>$('#dc'+d)?.classList.add('hl'));
+  (st.ok||[]).forEach(d=>{const e=$('#dc'+d);if(e){e.classList.remove('hl');e.classList.add('ok')}});
+  (st.bad||[]).forEach(d=>$('#dc'+d)?.classList.add('bad'));
+  if(st.sel!=null)$('#dc'+st.sel)?.classList.add('sel');
+  if(st.span&&L){const ds=st.span.slice().sort((a,b)=>a-b);const runs=[];ds.forEach(d=>{const r=runs[runs.length-1];if(r&&r[1]===d-1)r[1]=d;else runs.push([d,d])});
+    if(runs.length>1&&runs[0][0]===0&&runs[runs.length-1][1]===35){runs[0][0]=runs[runs.length-1][0]-36;runs.pop()}
+    L.innerHTML=runs.map(([a,b])=>'<path class="span-arc" d="'+sector(202,210,a*10,b*10+10)+'"/>').join('');}
+  const nar=narrowMQ.matches,ht=$('#hubText');
+  if(ht)ht.innerHTML=st.hub?'<text x="0" y="-4" text-anchor="middle" font-size="'+(nar?(st.hub.length>13?12.5:16):(st.hub.length>17?12.5:15))+'" style="font-family:var(--f-display)">'+esc(st.hub)+'</text>'+(st.hub2?'<text class="sm" x="0" y="16" text-anchor="middle" font-size="'+(nar?13:11)+'">'+esc(st.hub2)+'</text>':''):'<text class="sm" x="0" y="4" text-anchor="middle" font-size="'+(nar?14:11)+'">'+(S.mapMode==='find'?'Find it':'Tap a decan')+'</text>';
+}
+const TREE_POS=[null,[200,48],[322,118],[78,118],[322,262],[78,262],[200,334],[322,452],[78,452],[200,522],[200,600]];
+function treeSVG(){
+  let h='<svg viewBox="0 0 400 640" role="img" aria-label="Tree of Life with 22 paths">';
+  PATHS.forEach(([a,b],i)=>{const[x1,y1]=TREE_POS[a],[x2,y2]=TREE_POS[b];h+='<line class="tpath" id="tp'+i+'" x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"/>'});
+  PATHS.forEach(([a,b],i)=>{const[x1,y1]=TREE_POS[a],[x2,y2]=TREE_POS[b];h+='<line class="thit" data-path="'+i+'" x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"><title>Path '+(i+11)+'</title></line>'});
+  PATHS.forEach(([a,b],i)=>{const[x1,y1]=TREE_POS[a],[x2,y2]=TREE_POS[b];let mx=(x1+x2)/2,my=(y1+y2)/2;
+    if(i===2)my=190;if(i===14)my=400;
+    h+='<g data-path="'+i+'" style="cursor:pointer"><circle class="badge" id="tb'+i+'" cx="'+mx+'" cy="'+my+'" r="12"/><text class="hebg" x="'+mx+'" y="'+(my+5)+'" text-anchor="middle" font-size="14">'+HEB[LETTERS[i]][1]+'</text></g>'});
+  for(let s=1;s<=10;s++){const[x,y]=TREE_POS[s];h+='<g data-seph="'+s+'" style="cursor:pointer"><circle class="seph" id="ts'+s+'" cx="'+x+'" cy="'+y+'" r="29"/><text x="'+x+'" y="'+(y-3)+'" text-anchor="middle" font-size="9.5">'+SEPH[s]+'</text><text class="sm" x="'+x+'" y="'+(y+11)+'" text-anchor="middle" font-size="9">'+s+'</text></g>'}
+  return h+'</svg>';
+}
+function paintTree(){
+  const st=MAP.paint||{};
+  for(let i=0;i<22;i++){$('#tp'+i)?.setAttribute('class','tpath');$('#tb'+i)?.setAttribute('class','badge')}
+  for(let s=1;s<=10;s++)$('#ts'+s)?.setAttribute('class','seph');
+  const P_=(i,c)=>{$('#tp'+i)?.classList.add(c);$('#tb'+i)?.classList.add(c)};
+  (st.phl||[]).forEach(i=>P_(i,'hl'));(st.pok||[]).forEach(i=>P_(i,'ok'));(st.pbad||[]).forEach(i=>P_(i,'bad'));
+  (st.shl||[]).forEach(s=>$('#ts'+s)?.classList.add('hl'));(st.sok||[]).forEach(s=>$('#ts'+s)?.classList.add('ok'));(st.sbad||[]).forEach(s=>$('#ts'+s)?.classList.add('bad'));
+}
+const trumpOnPath=i=>CARDS.find(c=>c.group==='major'&&LETTERS.indexOf(S.naming==='both'?c.heb:hebKeyOf(c))===i);
+function renderMap(){
+  $('#mapSvg').innerHTML=S.mapKind==='wheel'?wheelSVG():treeSVG();
+  if(S.mapMode==='find'){if(!MAP.q||MAP.q.kind!==S.mapKind)newMapQ();else{paintMap();renderMapSide()}}
+  else{MAP.q=null;if(!MAP.paint||MAP.paint.kind!==S.mapKind)MAP.paint={kind:S.mapKind};paintMap();renderMapSide()}
+  $('#mapScore').innerHTML=S.mapMode==='find'?'<span><b>'+MAP.score+'</b>/ '+MAP.total+'</span>':'';
+}
+const paintMap=()=>S.mapKind==='wheel'?paintWheel():paintTree();
+if(narrowMQ.addEventListener)narrowMQ.addEventListener('change',()=>{if(TAB==='maps')renderMap()});
+function chipsFor(cards,onId){return '<div class="cardchips">'+cards.map(c=>'<button data-card="'+c.id+'" class="'+(onId===c.id?'on':'')+'">'+esc(shortName(c))+'</button>').join('')+'</div>'}
+function renderMapSide(){
+  const side=$('#mapSide');
+  if(S.mapMode==='find'){const q=MAP.q;if(!q){side.innerHTML='<div class="infocard"><p>No cards in the deck setting fit this map.</p></div>';return}
+    let h='<div class="infocard"><span class="q-eyebrow">'+esc(q.eyebrow)+'</span><p class="q-prompt" style="font-size:1.3rem">'+q.prompt+'</p>';
+    if(q.opts)h+='<div class="opts" style="grid-template-columns:minmax(0,1fr)">'+q.opts.map((o,i)=>'<button class="opt" data-mi="'+i+'"'+(q.done?' disabled':'')+'><span class="k">'+(i+1)+'</span><span>'+o.h+'</span></button>').join('')+'</div>';
+    if(q.done)h+='<div class="fb '+(q.ok?'ok':'no')+'">'+(q.ok?'Correct.':'Not quite.')+'</div><div class="why">'+q.why+'</div><div class="acts" style="display:flex;justify-content:flex-end"><button class="btn primary" id="mapNext">Next</button></div>';
+    else if(!q.opts)h+='<span class="hint">Tap the '+(S.mapKind==='wheel'?'wheel':'Tree')+'.</span>';
+    side.innerHTML=h+'</div>';
+    if(q.done&&q.opts)side.querySelectorAll('.opt').forEach((b,i)=>{if(q.opts[i].ok)b.classList.add('right');else if(i===q.picked)b.classList.add('wrong')});
+    side.querySelectorAll('[data-mi]').forEach(b=>b.addEventListener('click',()=>answerMap({opt:+b.dataset.mi})));
+    $('#mapNext')?.addEventListener('click',newMapQ);
+    return;}
+  const st=MAP.paint||{};let h='<div class="infocard">';
+  if(st.info)h+=st.info;
+  else h+=S.mapKind==='wheel'?'<h3>The zodiac wheel</h3><p class="note" style="margin:0">Aries starts at the left and the signs run counterclockwise. Each sign holds three decans, and each decan is one numbered card in the suit of the sign\u2019s element (the ring colour). Tap a decan or a sign, or pick a court card or Ace to see the part of the wheel it rules.</p>'
+    :'<h3>The Tree of Life</h3><p class="note" style="margin:0">Tap a Sephirah to see the cards placed there, or a path to see its trump. The paths are numbered 11 to 32 in Hebrew letter order.</p>';
+  if(S.mapKind==='wheel'){const ex=CARDS.filter(c=>(c.group==='court'||c.group==='ace')&&inPool(c));
+    if(ex.length)h+='<span class="lbl">Courts and Aces</span>'+chipsFor(ex,st.cardId);}
+  side.innerHTML=h+'</div>';
+  side.querySelectorAll('[data-card]').forEach(b=>b.addEventListener('click',()=>exploreCard(BYID[b.dataset.card])));
+}
+function exploreCard(c){
+  if(S.mapKind==='wheel'){
+    if(c.group==='number')MAP.paint={kind:'wheel',sel:c.dec,hub:shortName(c),hub2:c.planet+' in '+c.sign,cardId:c.id,info:'<h3>'+esc(shortName(c))+'</h3><div class="why">'+explain(c)+'</div>'};
+    else MAP.paint={kind:'wheel',hl:c.decs,span:c.decs,hub:shortName(c),cardId:c.id,info:'<h3>'+esc(shortName(c))+'</h3><div class="why">'+explain(c)+'</div>'};
+  }else{
+    if(c.group==='major'){const i=pathOf(c)-11;MAP.paint={kind:'tree',phl:[i],info:'<h3>'+esc(shortName(c))+'</h3><div class="why">'+explain(c)+'</div>'}}
+    else{const s=c.group==='court'?SEPH.indexOf(c.sephirah):c.n;sephInfo(s,c.id)}
+  }
+  paintMap();renderMapSide();
+}
+function sephInfo(s,onId){
+  const cs=CARDS.filter(c=>(c.group==='number'||c.group==='ace')&&c.n===s).concat(CARDS.filter(c=>c.group==='court'&&c.sephirah===SEPH[s]));
+  const paths=PATHS.map((p,i)=>p.includes(s)?i:-1).filter(i=>i>=0);
+  MAP.paint={kind:'tree',shl:[s],phl:[],info:'<h3>'+s+'. '+SEPH[s]+'</h3><p class="note" style="margin:0">'+(s===1?'The Aces, roots of the four elements.':'The '+WORD[s]+'s of every suit'+(cs.some(c=>c.group==='court')?', plus the '+cs.find(c=>c.group==='court').rank.t+'s':'')+'.')+' Paths touching it: '+paths.map(i=>i+11).join(', ')+'.</p>'+chipsFor(cs,onId)};
+}
+$('#mapSvg').addEventListener('click',e=>{
+  const dec=e.target.closest('[data-dec]'),sg=e.target.closest('[data-sign]'),pth=e.target.closest('[data-path]'),sp=e.target.closest('[data-seph]');
+  if(S.mapMode==='find'){
+    if(dec)answerMap({dec:+dec.dataset.dec});else if(pth)answerMap({path:+pth.dataset.path});else if(sp)answerMap({seph:+sp.dataset.seph});
+    return;}
+  if(dec)exploreCard(BYDEC[+dec.dataset.dec]);
+  else if(sg){const g=sg.dataset.sign,si=SIGNS.indexOf(g),t=triadOf(g);const m=CARDS.find(c=>c.group==='major'&&c.sign===g);
+    MAP.paint={kind:'wheel',hl:[si*3,si*3+1,si*3+2],hub:g,hub2:MODS[si%3]+' '+SIGN_EL[g],info:'<h3>'+deco('sign',g)+'</h3><p class="note" style="margin:0">The '+MODS[si%3]+' '+SIGN_EL[g]+' sign, from about '+INGRESS[g]+'. Trump: '+esc(shortName(m))+'. Decans:</p>'+chipsFor(t)};
+    paintMap();renderMapSide();}
+  else if(pth){exploreCard(trumpOnPath(+pth.dataset.path))}
+  else if(sp){sephInfo(+sp.dataset.seph);paintMap();renderMapSide()}
+});
+function newMapQ(){
+  const pl=pool();
+  if(S.mapKind==='wheel'){
+    const nums=pl.filter(c=>c.group==='number'),courts=pl.filter(c=>c.group==='court'||c.group==='ace');
+    const numSrc=nums.length?nums:(courts.length?NUMBERED:NUMBERED);
+    const kinds=['tap','name','tap'];if(courts.length)kinds.push('span','span');
+    const kind=pick(kinds);
+    if(kind==='tap'){const c=pick(numSrc);MAP.q={kind:'wheel',eyebrow:'Find the decan',prompt:'Tap the decan of <strong>'+esc(shortName(c))+'</strong>.',target:[c.dec],card:c};MAP.paint={kind:'wheel'}}
+    else if(kind==='name'){const c=pick(numSrc);const wrong=shuffle(NUMBERED.filter(x=>x.id!==c.id&&(x.sign===c.sign||x.n===c.n||Math.abs(x.dec-c.dec)<=2))).slice(0,3);
+      MAP.q={kind:'wheel',eyebrow:'Name the decan',prompt:'Which card is the highlighted decan?',card:c,opts:shuffle([{h:esc(shortName(c)),ok:true},...wrong.map(x=>({h:esc(shortName(x)),ok:false}))])};MAP.paint={kind:'wheel',sel:c.dec}}
+    else{const c=pick(courts);MAP.q={kind:'wheel',eyebrow:'Find the span',prompt:'Tap anywhere <strong>'+esc(shortName(c))+'</strong> rules.',target:c.decs,card:c};MAP.paint={kind:'wheel'}}
+  }else{
+    const majs=pl.filter(c=>c.group==='major'),mins=pl.filter(c=>c.group==='number'||c.group==='ace'||c.group==='court');
+    const kinds=[];if(majs.length||!mins.length)kinds.push('path','path','pathname');if(mins.length)kinds.push('seph','seph');
+    const kind=pick(kinds);const majSrc=majs.length?majs:CARDS.filter(c=>c.group==='major');
+    if(kind==='path'){const c=pick(majSrc);MAP.q={kind:'tree',eyebrow:'Find the path',prompt:'Tap the path of <strong>'+esc(shortName(c))+'</strong>.',target:[pathOf(c)-11],card:c,tp:'path'};MAP.paint={kind:'tree'}}
+    else if(kind==='pathname'){const c=pick(majSrc);const i=pathOf(c)-11;const wrong=shuffle(CARDS.filter(x=>x.group==='major'&&x.id!==c.id)).slice(0,3);
+      MAP.q={kind:'tree',eyebrow:'Name the path',prompt:'Which trump sits on the highlighted path ('+(i+11)+')?',card:c,opts:shuffle([{h:esc(shortName(c)),ok:true},...wrong.map(x=>({h:esc(shortName(x)),ok:false}))])};MAP.paint={kind:'tree',phl:[i]}}
+    else{const c=pick(mins);const s=c.group==='court'?SEPH.indexOf(c.sephirah):c.n;MAP.q={kind:'tree',eyebrow:'Find the Sephirah',prompt:'Tap the Sephirah of <strong>'+esc(shortName(c))+'</strong>.',target:[s],card:c,tp:'seph'};MAP.paint={kind:'tree'}}
+  }
+  paintMap();renderMapSide();$('#mapScore').innerHTML='<span><b>'+MAP.score+'</b>/ '+MAP.total+'</span>';
+}
+function answerMap(a){
+  const q=MAP.q;if(!q||q.done)return;let ok=false;
+  if(q.opts){if(a.opt==null)return;ok=q.opts[a.opt].ok;q.picked=a.opt}
+  else if(q.kind==='wheel'){if(a.dec==null)return;ok=q.target.includes(a.dec);MAP.paint={kind:'wheel',ok:q.target,bad:ok?[]:[a.dec],span:q.card.group!=='number'?q.target:null}}
+  else if(q.tp==='path'){if(a.path==null)return;ok=q.target[0]===a.path;MAP.paint={kind:'tree',pok:q.target,pbad:ok?[]:[a.path]}}
+  else{if(a.seph==null)return;ok=q.target[0]===a.seph;MAP.paint={kind:'tree',sok:q.target,sbad:ok?[]:[a.seph]}}
+  if(q.opts&&q.kind==='wheel')MAP.paint={kind:'wheel',sel:null,ok:[q.card.dec]};
+  q.done=true;q.ok=ok;q.why=explain(q.card);MAP.total++;if(ok)MAP.score++;
+  // a miss on the maps sends the related quiz item back to learning
+  const mk=q.kind==='wheel'?'sign':(q.card.group==='major'?'hebrew':'sephirah');
+  if(!ok&&build(q.card,mk,'cf'))grade(q.card.id+'|'+mk,'wrong');
+  paintMap();renderMapSide();$('#mapScore').innerHTML='<span><b>'+MAP.score+'</b>/ '+MAP.total+'</span>';
+}
+$$('input[name=mapkind]').forEach(r=>r.addEventListener('change',e=>{S.mapKind=e.target.value;save();MAP.q=null;MAP.paint=null;renderMap()}));
+$$('input[name=mapmode]').forEach(r=>r.addEventListener('change',e=>{S.mapMode=e.target.value;save();MAP.q=null;MAP.paint=null;renderMap()}));
+document.addEventListener('keydown',e=>{if(TAB!=='maps'||S.mapMode!=='find'||!MAP.q)return;
+  if(/^[1-4]$/.test(e.key)&&MAP.q.opts&&!MAP.q.done)answerMap({opt:+e.key-1});
+  else if(e.key==='Enter'&&MAP.q.done&&e.target.tagName!=='BUTTON'){e.preventDefault();newMapQ()}});
+
+/* ---------- matching game ---------- */
+const M={pairs:[],left:[],right:[],sel:null,done:new Set(),miss:0,start:0,end:0,flash:null};
+const matchFields=()=>QFIELDS.filter(k=>!(k==='other'&&S.naming==='both'));
+function buildMatchFields(){
+  const box=$('#matchField');box.innerHTML='';
+  const fs=matchFields().filter(k=>usablePairs(k).length>=4);
+  if(!fs.includes(S.matchField))S.matchField=fs[0]||'title';
+  fs.forEach(k=>{const l=document.createElement('label');l.innerHTML='<input type="radio" name="mf" value="'+k+'"'+(S.matchField===k?' checked':'')+'><span>'+esc(labelOf(k))+'</span>';
+    l.querySelector('input').addEventListener('change',()=>{S.matchField=k;save();newMatch()});box.append(l)});
+}
+function usablePairs(k){const seen=new Set();return shuffle(pool()).filter(c=>{const v=val(c,k);if(v==null||norm(nameStr(c)).includes(norm(v))||seen.has(v))return false;seen.add(v);return true})}
+function newMatch(){
+  const k=S.matchField;const cs=usablePairs(k).slice(0,6);
+  M.pairs=cs.map(c=>({id:c.id,v:val(c,k)}));M.left=shuffle(M.pairs.map(p=>p.id));M.right=shuffle(M.pairs.map(p=>p.id));
+  M.sel=null;M.done=new Set();M.miss=0;M.start=0;M.end=0;renderMatch();
+}
+function renderMatch(){
+  const box=$('#matchBoard');
+  if(M.pairs.length<3){box.innerHTML='<div class="empty">Not enough cards in the deck setting for this topic. Widen the deck or pick another topic.</div>';$('#matchScore').innerHTML='';return}
+  const k=S.matchField;const order=[...M.done];
+  const tile=(side,id)=>{const p=M.pairs.find(x=>x.id===id);const done=M.done.has(id);const sel=M.sel&&M.sel.side===side&&M.sel.id===id;const fl=M.flash&&M.flash.side===side&&M.flash.id===id;
+    const pi=order.indexOf(id);
+    return '<button class="tile '+(side==='l'?'name':'')+(done?' done p'+pi:'')+(sel?' sel':'')+(fl?' miss':'')+'" data-side="'+side+'" data-id="'+id+'"'+(done?' disabled':'')+'>'+(done?'<span class="pn">'+(pi+1)+'</span>':'')+'<span>'+(side==='l'?esc(shortName(BYID[id])):deco(k,p.v))+'</span></button>'};
+  let h='<div class="matchgrid"><div class="matchcol">'+M.left.map(id=>tile('l',id)).join('')+'</div><div class="matchcol">'+M.right.map(id=>tile('r',id)).join('')+'</div></div>';
+  if(M.done.size===M.pairs.length){const secs=Math.round((M.end-M.start)/1000);const best=P.match[k];
+    h+='<div class="infocard" style="margin-top:14px"><h3>Board cleared in '+secs+'s with '+M.miss+' miss'+(M.miss===1?'':'es')+'</h3><p class="note" style="margin:0">'+(best===secs&&M.miss===0?'New best clean time for this topic.':'Best clean time for '+esc(labelOf(k))+': '+(best?best+'s':'none yet')+'.')+'</p><div><button class="btn primary" id="matchAgain">New board</button></div></div>';}
+  box.innerHTML=h;$('#matchAgain')?.addEventListener('click',newMatch);
+  const secs=M.start?Math.round(((M.end||Date.now())-M.start)/1000):0;
+  $('#matchScore').innerHTML='<span><b>'+M.done.size+'</b>/ '+M.pairs.length+' pairs</span><span><b>'+M.miss+'</b>misses</span>';
+}
+$('#matchBoard').addEventListener('click',e=>{const b=e.target.closest('.tile');if(!b||b.disabled)return;
+  const side=b.dataset.side,id=b.dataset.id;if(!M.start)M.start=Date.now();
+  if(!M.sel||M.sel.side===side){M.sel={side,id};M.flash=null;renderMatch();return}
+  if(M.sel.id===id){M.done.add(id);M.sel=null;
+    if(M.done.size===M.pairs.length){M.end=Date.now();const secs=Math.round((M.end-M.start)/1000);if(M.miss===0&&(!P.match[S.matchField]||secs<P.match[S.matchField])){P.match[S.matchField]=secs}saveP()}
+    renderMatch();return}
+  M.miss++;M.flash={side,id};const missedId=side==='l'?id:M.sel.id;const key=missedId+'|'+S.matchField;if(build(BYID[missedId],S.matchField,'cf')||build(BYID[missedId],S.matchField,'fc'))grade(key,'wrong');
+  M.sel=null;renderMatch();setTimeout(()=>{M.flash=null;renderMatch()},600);
+});
+$('#matchNew').addEventListener('click',newMatch);
+
+/* ---------- progress ---------- */
+let APPL={key:'',map:{}};
+function applicable(){
+  if(APPL.key===S.naming)return APPL.map;const map={};
+  CARDS.forEach(c=>QFIELDS.forEach(k=>{if(k==='other'&&S.naming==='both')return;if(build(c,k,'cf')||build(c,k,'fc'))map[c.id+'|'+k]=1}));
+  APPL={key:S.naming,map};return map;
+}
+function stageStats(st){const A=applicable();let tot=0,strong=0,seen=0;
+  CARDS.forEach(c=>{if(!st.groups.includes(c.group))return;st.fields.forEach(k=>{const key=c.id+'|'+k;if(!A[key])return;tot++;const s=P.srs[key];if(s){seen++;if(s.b>=4)strong++}})});
+  return{tot,strong,seen};}
+function renderProgress(){
+  if(TAB!=='progress')return;
+  const A=applicable();const now=Date.now();
+  const all=Object.keys(A),seen=all.filter(k=>P.srs[k]),strong=seen.filter(k=>P.srs[k].b>=4),due=seen.filter(k=>P.srs[k].due<=now);
+  const acc=P.stats.n?Math.round(100*P.stats.r/P.stats.n)+'%':'–';
+  $('#statTiles').innerHTML=[[P.stats.n,'answered'],[acc,'accuracy'],[strong.length+' / '+all.length,'strong items'],[due.length,'due now'],[(P.daily.streak||0),'day streak · best '+(P.daily.best||0)],[(P.speed.best||0),'speed best']]
+    .map(([b,s])=>'<div class="stat"><b>'+b+'</b><span>'+s+'</span></div>').join('');
+  $('#stages').innerHTML=STAGES.map(st=>{const s=stageStats(st);const pct=s.tot?Math.round(100*s.strong/s.tot):0;
+    return '<div class="stage"><div><div class="t">'+st.name+'</div><div class="d">'+st.desc+' · '+s.seen+' of '+s.tot+' seen</div></div><button class="btn" data-stage="'+st.id+'">Practice</button><div class="bar"><i style="width:'+pct+'%"></i></div><span class="pct">'+pct+'% strong</span></div>'}).join('')+'<p class="hint" style="margin:0">Strong means the next review is a week or more away.</p>';
+  $$('#stages [data-stage]').forEach(b=>b.addEventListener('click',()=>{const st=STAGES.find(x=>x.id===+b.dataset.stage);
+    GROUPS.forEach(([g])=>S.groups[g]=st.groups.includes(g));SUITS.forEach(s=>S.suits[s.id]=true);QFIELDS.forEach(k=>S.qf[k]=st.fields.includes(k));
+    S.mode='smart';S.src='pool';save();buildSide();renderRef();draw();showTab('quiz');resetQuiz()}));
+  $('#legend').innerHTML='<span><i class="lv0"></i>not seen</span><span><i class="lv1"></i>missed / learning</span><span><i class="lv2"></i>1 day</span><span><i class="lv3"></i>3 days</span><span><i class="lv4"></i>1 week</span><span><i class="lv5"></i>2 weeks</span><span><i class="lv6"></i>mastered</span>';
+  const cols=QFIELDS.filter(k=>!(k==='other'&&S.naming==='both'));
+  const groups=[['Trumps',c=>c.group==='major','spirit'],...SUITS.map(s=>[suitLabel(s.id),c=>c.suit===s.id,s.el.toLowerCase()])];
+  let h='<thead><tr><th>Card</th>'+cols.map(k=>'<th>'+esc(labelOf(k).replace(' letter','').replace('Esoteric title','Esoteric').replace('Decan dates','Dates'))+'</th>').join('')+'</tr></thead><tbody>';
+  groups.forEach(([gname,f,el])=>{const cs=CARDS.filter(c=>f(c)&&inPool(c)).sort((a,b)=>a.order-b.order);if(!cs.length)return;
+    let gt=0,gs=0,gn=0;cs.forEach(c=>cols.forEach(k=>{const key=c.id+'|'+k;if(!A[key])return;gt++;const s=P.srs[key];if(s){gn++;if(s.b>=4)gs++}}));
+    h+='<tr class="grp"><td colspan="'+(cols.length+1)+'"><span class="dot '+el+'"></span>'+esc(gname)+'<span class="gsum">'+gs+' strong · '+gn+' seen · '+gt+' items</span></td></tr>';
+    cs.forEach(c=>{h+='<tr><td class="nm">'+esc(shortName(c))+'</td>'+cols.map(k=>{const key=c.id+'|'+k;if(!A[key])return'<td class="na"></td>';const s=P.srs[key];const lv=s?s.b:0;
+      const tip=s?(labelOf(k)+': seen '+s.n+'×, '+s.r+' right, next review '+(s.due<=now?'now':new Date(s.due).toLocaleDateString())):labelOf(k)+': not seen yet';
+      return '<td><button class="cell lv'+lv+'" data-q="'+key+'" title="'+esc(tip)+'" aria-label="'+esc(shortName(c)+', '+tip)+'"></button></td>'}).join('')+'</tr>'})});
+  $('#mmTable').innerHTML=h+'</tbody>';
+  renderBackup();
+}
+$('#mmTable').addEventListener('click',e=>{const b=e.target.closest('[data-q]');if(!b)return;const[id,k]=b.dataset.q.split('|');
+  if(S.mode==='speed'||S.mode==='daily'){S.mode='smart';save();buildSide()}
+  QS.forced={id,k};showTab('quiz');nextQ()});
+function renderBackup(){const el=$('#backupStatus');if(!el)return;
+  const le=lastExport();const changed=!le||(P.t||0)>(le.pt||0);const stale=!le||Date.now()-le.t>7*DAY;
+  el.className='sync'+(changed&&stale&&P.stats.n>0?' warn':' on');
+  el.innerHTML='<span class="dot"></span>'+(le?'Last saved to a file '+daysAgo(le.t)+(changed?', and you\u2019ve practised since.':', and nothing has changed since.'):(P.stats.n?'Not saved to a file yet.':'Nothing to save yet. Answer a few questions first.'));}
+$('#exportBtn').addEventListener('click',exportProgress);
+$('#importFile').addEventListener('change',e=>{importProgress(e.target.files[0]);e.target.value=''});
+let resetArmed=false;
+$('#resetProg').addEventListener('click',e=>{if(!resetArmed){resetArmed=true;e.target.textContent='Tap again to erase all progress';setTimeout(()=>{resetArmed=false;e.target.textContent='Reset all progress'},4000);return}
+  resetArmed=false;e.target.textContent='Reset all progress';P=blankP();saveP();MISSED.clear();renderProgress();renderScore();renderMissed()});
+
+/* ---------- reference ---------- */
+function renderRef(){
+  const cols=FIELDS.filter(([k])=>!(k==='other'&&S.naming==='both'));
+  const rows=pool().sort((a,b)=>a.order-b.order);
+  $('#refTable').innerHTML='<thead><tr>'+cols.map(([k])=>'<th>'+esc(labelOf(k))+'</th>').join('')+'</tr></thead><tbody>'+
+   rows.map(c=>'<tr>'+cols.map(([k])=>{const v=val(c,k);
+     if(k==='name')return'<td class="nm"><span class="dot '+elClass(c).slice(3)+'"></span>'+esc(v)+'</td>';
+     return'<td class="'+(k==='number'||k==='dates'?'mono':'')+'">'+(v==null?'<span style="color:var(--muted)">–</span>':deco(k,v))+'</td>'}).join('')+'</tr>').join('')+'</tbody>';
+}
+
+/* ---------- phone: settings start folded ---------- */
+const mq=window.matchMedia('(max-width:860px)');
+const fitPanel=()=>{$('#settings').open=!mq.matches};
+fitPanel();if(mq.addEventListener)mq.addEventListener('change',fitPanel);
+$('#settings').addEventListener('toggle',e=>{if(!mq.matches&&!e.target.open)e.target.open=true});
+
+/* ---------- boot ---------- */
+buildSide();syncSpreadSeg();draw();renderRef();buildMatchFields();newMatch();nextQ(true);renderMissed();renderBackup();
+})();
+</script>
+
+<script>
+/* App shell: offline support and install button (only in the self-hosted copy). */
+(function(){
+  if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+    window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+  }
+  let deferred=null;
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault();deferred=e;
+    const sub=document.querySelector('header .sub');if(!sub||document.getElementById('installBtn'))return;
+    const b=document.createElement('button');b.id='installBtn';b.className='install-btn';b.textContent='Install app';
+    b.addEventListener('click',async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice.catch(()=>{});deferred=null;b.remove()});
+    sub.append(b);
+  });
+  window.addEventListener('appinstalled',()=>document.getElementById('installBtn')?.remove());
+})();
+</script>
+</body>
+</html>

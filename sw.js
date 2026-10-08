@@ -1,7 +1,7 @@
 /* Tarot Correspondence Drill: offline support.
    The page is fetched fresh when you're online (so uploads to GitHub show up on the next open),
    and served from the saved copy when you're offline. Fonts are saved the first time they load. */
-const VERSION='2026-10-06.1';
+const VERSION='2026-10-08.1';
 const SHELL='tarot-shell-'+VERSION, FONTS='tarot-fonts';
 const FILES=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','icon-maskable-512.png','apple-touch-icon.png','favicon.png'];
 

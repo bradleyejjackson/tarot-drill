@@ -6,7 +6,11 @@ It doesn't interpret cards. It helps you memorise the system behind them, so you
 
 **▶ Open the app:** `https://bradleyejjackson.github.io/tarot-drill/`
 
-It runs entirely in your browser. There's nothing to sign up for, it installs to your phone's home screen, and it works offline.
+It runs entirely in your browser, with Pamela Colman Smith's original 1909 Rider–Waite–Smith pictures. There's nothing to sign up for, it installs to your phone's home screen, and it works offline.
+
+---
+
+**Start here:** the guide (link under the title) maps the app to a three-stage study plan, with buttons that set up the right practice for each stage.
 
 ---
 
@@ -17,11 +21,13 @@ It runs entirely in your browser. There's nothing to sign up for, it installs to
 - Draw 1, 3, 4, 5, 7 or 10 (Celtic Cross) cards, or any number up to 22, with optional reversals.
 - Choose what each card shows: name, number, suit, element, planet, sign, Thoth title, Hebrew letter, Sephirah, decan dates, esoteric title, or the other deck's name.
 - Hidden fields can be tapped to reveal, so you can test yourself on a spread.
+- Optional RWS pictures on every card (turned upside down when reversed).
 
 ### Quiz
 - **Smart review:** spaced repetition. Weak and overdue items come first, and items you know come back at growing intervals (1 day, 3 days, 1 week, 2 weeks, 5 weeks). After a correct answer you mark **Knew it** or **Guessed**, and guesses are reviewed again soon.
 - **Shuffled rounds:** every question once per round, in random order.
 - **Daily ten:** ten due items a day, with a day streak.
+- **New items per day:** a daily limit (10, 20, 40 or none) so turning on a big topic doesn't flood your reviews.
 - **Speed round:** as many as you can in 60 seconds.
 - Questions go both ways (card → fact and fact → card). Answer by multiple choice or by typing; typed answers accept common variants and small typos ("4 cups", "Pentacles", "Tiferet", "King of Cups" for the Thoth Knight).
 - **Hints** give the rule rather than the answer, for example the Chaldean order of the decan planets.
@@ -34,11 +40,12 @@ It runs entirely in your browser. There's nothing to sign up for, it installs to
 - **Positions:** learn what each position in a spread means, including tapping its place in the layout.
 - **Elemental dignities:** practise how neighbouring cards strengthen or weaken each other, in pairs or in rows of three, using the modern Thoth rules (Fire–Air and Water–Earth friendly, Fire–Water and Air–Earth contrary, Fire–Earth and Air–Water neutral). Each answer shows the relationship between every pair of cards.
 - **Quick reading:** draw two or three cards (or use your last spread), write your own reading, then reveal each card's Thoth keywords, Waite's RWS meaning (reversed when the card is), its dignity, and the patterns in the spread: dominant element, trumps, courts, repeated numbers, shared planets and signs.
-- **Journal:** save your readings and reopen them later.
+- **Journal:** save your readings, reopen them later, and export the whole journal as a readable Markdown document.
 
 ### Meanings
 - **Thoth keywords:** a starter set of short keywords for every card, written to be rewritten. Edit them on the Reference tab and the quiz, spreads and readings use your words.
 - **RWS meanings:** A. E. Waite's divinatory meanings, upright and reversed, from *The Pictorial Key to the Tarot* (1910, public domain).
+- **Picture quiz:** name each card from its RWS picture.
 - Quiz yourself on both: card → meaning is self-checked (Missed / Close / Got it); meaning → card is multiple choice. Both feed the spaced repetition.
 
 ### Wheel & Tree
@@ -80,6 +87,8 @@ After the first visit it works without a connection.
 
 ## Sources
 
+Card pictures are Pamela Colman Smith's illustrations for the Rider–Waite–Smith deck (1909), in the public domain; the scans come from Wikimedia Commons. The Thoth paintings by Lady Frieda Harris are still under copyright and are not included.
+
 RWS divinatory meanings are from A. E. Waite, *The Pictorial Key to the Tarot* (1910), which is in the public domain. The Thoth keywords are original starter summaries, meant to be replaced with your own.
 
 ## Correspondences
@@ -97,6 +106,7 @@ If you find an attribution that doesn't match your sources, please open an issue
 | `index.html` | The whole app: one self-contained page |
 | `manifest.webmanifest` | App name and icons, so it can be installed |
 | `sw.js` | Offline support |
+| `cards/` | The 78 RWS card pictures |
 | `icon-*.png`, `apple-touch-icon.png`, `favicon.png` | App icons |
 
 To update the app, replace `index.html` and commit. GitHub Pages republishes it within a minute or two, and installed copies pick up the change the next time they open online. If you edit `sw.js`, change its `VERSION` line too.

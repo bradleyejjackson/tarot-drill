@@ -184,6 +184,24 @@ table.ref td.long{min-width:240px;max-width:340px;font-size:.78rem;line-height:1
 textarea.reading.sm{min-height:70px}
 .qtext{font-family:var(--f-display);font-size:1.2rem}
 .scanq{display:flex;flex-direction:column;gap:12px}
+.cimg{display:block;width:100%;height:auto;border-radius:6px;background:var(--sunk);aspect-ratio:260/449}
+.cimg.rev{transform:rotate(180deg)}
+.tc-pic{max-width:150px;margin:0 auto}
+.mini .tc-pic{max-width:110px;margin:2px auto 4px}
+.qpic{max-width:220px;margin:0 auto}
+.why .whypic{float:right;width:84px;margin:0 0 8px 12px}
+.why::after{content:"";display:block;clear:both}
+.gblock .gpic{float:left;width:86px;margin:2px 14px 6px 0}
+.gblock::after{content:"";display:block;clear:both}
+.guide{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px clamp(16px,3vw,28px);margin-bottom:22px;display:flex;flex-direction:column;gap:16px}
+.guide h2{font-family:var(--f-display);font-weight:400;font-size:1.5rem;margin:0}
+.guide .gtop{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.gcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.gcard{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.gcard h3{margin:0;font-size:1rem}
+.gcard ul{margin:0;padding-left:18px;font-size:.88rem;display:flex;flex-direction:column;gap:4px}
+.gcard .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.gcard .acts .btn{padding:6px 12px;font-size:.82rem}
 .minicards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .mini{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
 .mini .band{height:6px;background:var(--line)}
@@ -408,7 +426,7 @@ table.ref td.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;wh
 <header class="top">
   <div>
     <h1>Tarot Correspondence Drill</h1>
-    <p class="sub">78 cards · Thoth and Rider–Waite–Smith attributions · Golden Dawn decans</p>
+    <p class="sub">78 cards · Thoth and Rider–Waite–Smith attributions · Golden Dawn decans · <button class="link" id="guideBtn">Start here</button></p>
   </div>
   <nav class="tabs" role="tablist" id="tabs">
     <button role="tab" data-tab="spread" aria-selected="true">Spread</button>
@@ -450,6 +468,7 @@ table.ref td.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;wh
 </details>
 
 <main>
+  <section id="guide" class="guide" hidden></section>
   <!-- SPREAD -->
   <section id="tab-spread">
     <div class="toolbar">
@@ -476,6 +495,7 @@ table.ref td.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;wh
           <span class="lbl">Show on drawn cards</span>
           <div class="chips" id="showChips"></div>
         </div>
+        <label class="chip"><input type="checkbox" id="picsToggle"><span>Show RWS pictures (Pamela Colman Smith, 1909)</span></label>
         <label class="hint" for="hiddenMode">Fields that are off:
           <select id="hiddenMode">
             <option value="reveal">tap to reveal</option>
@@ -521,7 +541,9 @@ table.ref td.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;wh
           </div>
         </div>
         <div class="group">
-          <span class="lbl">Cards from</span>
+          <label class="lbl" for="newCap">New items per day (Smart review, Daily ten)</label>
+          <select id="newCap"><option value="10">10</option><option value="20">20</option><option value="40">40</option><option value="0">No limit</option></select>
+          <span class="lbl" style="margin-top:6px">Cards from</span>
           <div class="seg">
             <label><input type="radio" name="src" id="src-pool" value="pool"><span>Deck setting</span></label>
             <label><input type="radio" name="src" id="src-spread" value="spread"><span>Last spread</span></label>
@@ -730,12 +752,16 @@ const RWSM={"M1":["Skill, diplomacy, address, subtlety; sickness, pain, loss, di
 /* Starter Thoth keywords: short original summaries, editable on the Reference tab. */
 const KW0={"M0":"Pure potential; a leap into the unknown; spontaneity; innocence; the breath before beginning","M1":"Will and skill; communication; focused intent; craft; making ideas real","M2":"Intuition; inner knowing; receptive stillness; hidden truths; self-sufficiency","M3":"Love and creativity; fertility; nurture; beauty; abundance of the senses","M4":"Authority; structure; leadership; the drive to build; stability through will","M5":"Teaching and tradition; inner guidance; learning; spiritual authority; patience","M6":"Union of opposites; choice; relationship; integration; dialogue between parts of the self","M7":"Protected progress; discipline in motion; carrying what is sacred; self-mastery; victory","M8":"Balance; fairness; accountability; correcting course; cause and effect","M9":"Solitude; inner light; wisdom through reflection; completion; quiet guidance","M10":"Turning cycles; luck; expansion; turning points; letting go of control","M11":"Passion and vitality; courage; joyful strength; desire embraced; creative power","M12":"Surrender; suspension; breaking old patterns; sacrifice; a new perspective","M13":"Transformation; endings that clear the way; release; renewal; deep change","M14":"Integration; alchemy; balancing opposites; creative synthesis; moderation","M15":"Earthy creative drive; ambition; humour; temptation and bondage; materiality","M16":"Sudden upheaval; collapse of false structures; awakening; purification; release","M17":"Hope; inspiration; renewal; self-trust; openness to the universe","M18":"Illusion; dreams; fear of the unknown; intuition; passage through darkness","M19":"Joy; vitality; success; clarity; freedom and collaboration","M20":"Rebirth; a new era; reckoning with the past; awakening; seeing the whole","M21":"Completion; wholeness; integration; the world as it is; a cycle fulfilled","wands1":"Raw creative fire; spiritual energy; enthusiasm; initiative","wands2":"Will directed; mastery; bold initiative; claiming territory","wands3":"Integrity; strength of character; established power; honest effort","wands4":"A project fulfilled; harmony; order achieved; celebration","wands5":"Struggle; competition; frustrated energy; a conflict of wills","wands6":"Success after effort; recognition; triumph; confidence","wands7":"Courage against the odds; standing firm; defence; boldness","wands8":"Speed; quick communication; rapid developments; mental energy","wands9":"Great power held in reserve; resilience; steady force; health","wands10":"Overload; burden; force misused; carrying too much","cups1":"Emotional fulfilment; love; receptivity; the source of feeling","cups2":"Harmony between two; partnership; mutual attraction; balanced feeling","cups3":"Overflowing emotion; sharing; celebration; fertility","cups4":"Comfort; pleasure; emotional complacency; enough, perhaps too much","cups5":"Loss of expectation; emotional letdown; grief; things not as hoped","cups6":"Emotional well-being; enjoyment; harmony; desire satisfied","cups7":"Excess; indulgence; illusion; emotional poisoning","cups8":"Stagnation; emotional exhaustion; giving up; low energy","cups9":"Contentment; wishes fulfilled; emotional security; joy","cups10":"Emotional completion; fullness; restlessness after fulfilment; time for change","swords1":"Clarity of mind; a breakthrough thought; truth; decisive intellect","swords2":"A truce of the mind; balance; rest after strife; resolution","swords3":"Grief; heartbreak; painful truth; melancholy","swords4":"Retreat; recovery; a pause in conflict; rest","swords5":"Loss; fearful thinking; failure; humiliation","swords6":"Objectivity; understanding; perspective; a rational solution","swords7":"Wasted effort; half-measures; doubt; vacillation","swords8":"Distraction; obstacles; scattered thought; meddling","swords9":"Anxiety; self-criticism; despair; mental torment","swords10":"Plans collapsing; an ending; thinking things to destruction; release","disks1":"Material opportunity; health and the body; prosperity; grounded beginnings","disks2":"Fluctuation; adaptability; balancing resources; cycles","disks3":"Constructive effort; skill; teamwork; building","disks4":"Material security; control; stability; consolidation","disks5":"Financial or physical strain; anxiety; hardship; insecurity","disks6":"Material gain; generosity; balance; achievement","disks7":"Stagnation; fear of loss; effort without reward; delay","disks8":"Careful planning; patience; diligence; slow growth","disks9":"Material increase; comfort; good fortune; security","disks10":"Abundance; inheritance; material goals fulfilled; prosperity","wandsKnight":"Swift energy; impulsive action; passion; adventure","wandsQueen":"Confident warmth; generosity; magnetism; self-assurance","wandsPrince":"Bold innovator; ambition; quick to act; pride","wandsPrincess":"An enthusiastic spark; daring; new ventures; a free spirit","cupsKnight":"Idealism; romantic pursuit; sensitivity; inspiration","cupsQueen":"Reflection; intuition; compassion; dreaminess","cupsPrince":"Emotional intensity; secrecy; artistry; passion","cupsPrincess":"Gentleness; imagination; kindness; emotional openness","swordsKnight":"Decisiveness; drive; a focused attack; purpose","swordsQueen":"Clear sight; perception; independence; cutting through illusion","swordsPrince":"Intellect; many ideas; restlessness; analysis","swordsPrincess":"Vigilance; a practical mind; defensiveness; cleverness","disksKnight":"Hard work; patience; dependability; productivity","disksQueen":"Nurture; resourcefulness; practicality; fertility","disksPrince":"Steadiness; method; persistence; a builder","disksPrincess":"Groundedness; study; potential; new growth"};
 const MEANING=['thothkw','rwsup','rwsrev'];
+/* Card pictures: Pamela Colman Smith's 1909 Rider–Waite–Smith illustrations (public domain), scans via Wikimedia Commons. */
+const IMG=id=>'cards/'+id+'.webp';
+const picH=(c,o={})=>S.pics||o.force?'<img class="cimg'+(o.rev?' rev':'')+(o.cls?' '+o.cls:'')+'" src="'+IMG(c.id)+'" alt="'+esc(nameIn(c,'rws'))+(o.rev?', reversed':'')+'" loading="lazy" decoding="async">':'';
+document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.classList.contains('cimg'))t.remove()},true);
 const NUMBERED=CARDS.filter(c=>c.group==='number');
 const BYDEC=[];NUMBERED.forEach(c=>BYDEC[c.dec]=c);
 
 const GROUPS=[['major','Trumps (Major)'],['ace','Aces'],['number','Numbered 2–10'],['court','Courts']];
-const FIELDS=[['name','Name'],['number','Number'],['suit','Suit'],['element','Element'],['planet','Planet'],['sign','Sign'],['title','Title'],['hebrew','Hebrew letter'],['sephirah','Sephirah'],['dates','Decan dates'],['esoteric','Esoteric title'],['other','Other deck’s name'],['thothkw','Thoth keywords'],['rwsup','RWS meaning'],['rwsrev','RWS reversed']];
-const QFIELDS=['number','element','planet','sign','title','hebrew','sephirah','dates','esoteric','other','thothkw','rwsup','rwsrev'];
+const FIELDS=[['name','Name'],['number','Number'],['suit','Suit'],['element','Element'],['planet','Planet'],['sign','Sign'],['title','Title'],['hebrew','Hebrew letter'],['sephirah','Sephirah'],['dates','Decan dates'],['esoteric','Esoteric title'],['other','Other deck’s name'],['thothkw','Thoth keywords'],['rwsup','RWS meaning'],['rwsrev','RWS reversed'],['picture','RWS picture']];
+const QFIELDS=['number','element','planet','sign','title','hebrew','sephirah','dates','esoteric','other','thothkw','rwsup','rwsrev','picture'];
 const STAGES=[
  {id:1,name:'Stage 1 · Numbered cards',desc:'Aces and 2–10: titles, elements, sephiroth',groups:['ace','number'],fields:['title','element','sephirah']},
  {id:2,name:'Stage 2 · Courts and Majors',desc:'Numbers, Hebrew letters, elements, attributions, other-deck names',groups:['major','court'],fields:['number','element','hebrew','planet','sign','sephirah','other']},
@@ -746,8 +772,8 @@ const STAGES=[
 const DEF={naming:'thoth',groups:{major:true,ace:true,number:true,court:true},suits:{wands:true,cups:true,swords:true,disks:true},
   show:{name:true,number:true,suit:true,element:true,planet:false,sign:false,title:false,hebrew:false,sephirah:false,dates:false,esoteric:false,other:false,thothkw:false,rwsup:false,rwsrev:false},
   hiddenMode:'reveal',spreadN:3,reversals:false,
-  qf:{number:true,element:true,planet:true,sign:true,title:true,hebrew:false,sephirah:false,dates:false,esoteric:false,other:false,thothkw:false,rwsup:false,rwsrev:false,patterns:true},
-  dir:'mix',ans:'choice',src:'pool',mode:'smart',mapKind:'wheel',mapMode:'explore',matchField:'title',readMode:'guided',layout:'free',scanLayout:'celtic',digMode:'triad',digShowEl:false,synN:3,refView:'table'};
+  qf:{number:true,element:true,planet:true,sign:true,title:true,hebrew:false,sephirah:false,dates:false,esoteric:false,other:false,thothkw:false,rwsup:false,rwsrev:false,picture:false,patterns:true},
+  dir:'mix',ans:'choice',src:'pool',mode:'smart',mapKind:'wheel',mapMode:'explore',matchField:'title',readMode:'guided',layout:'free',newCap:20,pics:true,scanLayout:'celtic',digMode:'triad',digShowEl:false,synN:3,refView:'table'};
 let S=JSON.parse(JSON.stringify(DEF));
 try{const raw=localStorage.getItem('tarot-drill-v1');if(raw){const o=JSON.parse(raw);for(const k in DEF){if(o[k]!==undefined){S[k]=(typeof DEF[k]==='object')?Object.assign({},DEF[k],o[k]):o[k]}}}}catch(e){}
 const save=()=>{try{localStorage.setItem('tarot-drill-v1',JSON.stringify(S))}catch(e){}};
@@ -755,7 +781,7 @@ const save=()=>{try{localStorage.setItem('tarot-drill-v1',JSON.stringify(S))}cat
 /* ---------- progress (synced across devices when available) ---------- */
 const DAY=864e5,MIN=6e4;
 const INTERVALS=[0,10*MIN,DAY,3*DAY,7*DAY,16*DAY,35*DAY];
-const blankP=()=>({v:1,srs:{},daily:{last:null,streak:0,best:0,lastScore:null},speed:{best:0,last:null},match:{},stats:{n:0,r:0},kw:{},journal:[],jdel:[],t:0});
+const blankP=()=>({newLog:{d:'',n:0},v:1,srs:{},daily:{last:null,streak:0,best:0,lastScore:null},speed:{best:0,last:null},match:{},stats:{n:0,r:0},kw:{},journal:[],jdel:[],t:0});
 let P=blankP();
 try{const raw=localStorage.getItem('tarot-drill-progress');if(raw)P=Object.assign(blankP(),JSON.parse(raw))}catch(e){}
 function mergeP(a,b){
@@ -778,6 +804,13 @@ function saveP(){P.t=Date.now();try{localStorage.setItem('tarot-drill-progress',
 const FILE_APP='tarot-correspondence-drill';
 function lastExport(){try{return JSON.parse(localStorage.getItem('tarot-drill-lastexport')||'null')}catch(e){return null}}
 function daysAgo(t){const d=Math.floor((Date.now()-t)/DAY);return d<=0?'today':d===1?'yesterday':d+' days ago'}
+async function saveTextFile(name,text,mime){
+  const dl=window.claude&&window.claude.use?await window.claude.use('downloads'):null;
+  if(dl){await dl.save({filename:name,data:text});return true}
+  const url=URL.createObjectURL(new Blob([text],{type:mime}));
+  const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);return true;
+}
+const saveErr=e=>{const c=e&&e.code;return c==='declined'?'Save cancelled. Nothing was saved.':c==='rate_limited'?'A save prompt is already open. Finish that one first.':'The file could not be saved here.'};
 async function exportProgress(){
   const name='tarot-drill-progress-'+todayStr()+'.json';
   const text=JSON.stringify({app:FILE_APP,format:1,exported:new Date().toISOString(),progress:P,settings:S});
@@ -845,6 +878,7 @@ function val(c,k){
     case 'thothkw':return kwOf(c);
     case 'rwsup':return RWSM[c.id]?RWSM[c.id][0]:null;
     case 'rwsrev':return RWSM[c.id]?RWSM[c.id][1]:null;
+    case 'picture':return null;
     default:return c[k]??null;
   }
 }
@@ -888,11 +922,13 @@ function explain(c){
   const [a,b]=PATHS[pos-1];
   let s='Atu '+num+' '+N+' carries '+hebH(key)+', letter '+pos+' of 22. That is a '+typ+' letter, so it takes '+(typ==='mother'?'an element':typ==='double'?'a planet':'a sign')+': '+B(deco('any',c.attr))+'. It sits on path '+(pos+10)+' of the Tree, joining '+SEPH[a]+' and '+SEPH[b]+'.';
   if(c.id==='M4'||c.id==='M17')s+=' Crowley swapped Tzaddi and Heh between the Emperor and the Star; the Golden Dawn and RWS order gives the Emperor Heh and the Star Tzaddi.';
+  if(c.id==='M0'||c.id==='M12'||c.id==='M20')s+=' Some modern books also give it an outer planet ('+({M0:'Uranus',M12:'Neptune',M20:'Pluto'})[c.id]+'), which is not part of Book T.';
   if(c.id==='M8'||c.id==='M11')s+=' The Golden Dawn put Strength at VIII and Justice at XI; Crowley restored Lust to XI and Adjustment to VIII so they follow the letters Teth and Lamed in order.';
   return s;
 }
 function hint(c,k,dir){
   const suitT=c.suit?suitLabel(c.suit):'';
+  if(dir==='fc'&&k==='picture')return 'It\u2019s '+(c.group==='major'?'a trump':c.group==='court'?'a court card':'in '+suitT)+'.';
   if(dir==='fc'){
     if(c.group==='major'){const key=hebKeyOf(c);return 'It’s a '+letterType(key)+'-letter trump.'+(k==='number'?' The Atu number is its letter’s position minus one.':'')}
     if(c.group==='number'&&(k==='planet'||k==='sign')){const si=SIGNS.indexOf(c.sign);return 'It’s in '+suitT+'. '+c.sign+' is the '+MODS[si%3]+' '+SIGN_EL[c.sign]+' sign, so look at '+BASE[si%3]+'–'+(BASE[si%3]+2)+'.'}
@@ -925,6 +961,7 @@ function hint(c,k,dir){
       if(c.group==='court')return 'It is '+c.element+': the '+c.rank.t+'\u2019s '+c.rank.sub+' acting through the suit\u2019s '+SUIT[c.suit].el+'.';
       return 'Its attribution is '+deco('any',c.attr)+'. Its esoteric title: \u201c'+esc(c.esoteric)+'\u201d.';
     case 'rwsup':case 'rwsrev':{const v=val(c,k)||'';return 'It begins \u201c'+esc(v.split(/[ ,;]+/).slice(0,3).join(' '))+'\u2026\u201d'}
+    case 'picture':return 'It\u2019s '+(c.group==='major'?'a trump':c.group==='court'?'a court card':'in '+suitT)+'.';
     case 'other':return 'Thoth renames: Magician→Magus, High Priestess→Priestess, Justice→Adjustment, Strength→Lust, Wheel of Fortune→Fortune, Temperance→Art, Judgement→Aeon, World→Universe. Courts: King→Knight, Knight→Prince, Page→Princess.';
   }
   return '';
@@ -939,17 +976,18 @@ function buildSide(){
   const g=$('#groups');g.innerHTML='';GROUPS.forEach(([k,l])=>g.append(chip('grp-'+k,l,S.groups[k],v=>{S.groups[k]=v;changed()})));
   const su=$('#suits');su.innerHTML='';SUITS.forEach(s=>su.append(chip('suit-'+s.id,S.naming==='rws'?s.rws:(S.naming==='both'&&s.id==='disks'?'Disks/Pentacles':s.thoth),S.suits[s.id],v=>{S.suits[s.id]=v;changed()})));
   const sc=$('#showChips');sc.innerHTML='';FIELDS.forEach(([k])=>{if(k==='other'&&S.naming==='both')return;sc.append(chip('show-'+k,labelOf(k),S.show[k],v=>{S.show[k]=v;save();buildSide();renderSpread()}))});
-  $('#hiddenMode').value=S.hiddenMode;
+  $('#hiddenMode').value=S.hiddenMode;$('#picsToggle').checked=S.pics;$('#newCap').value=String(S.newCap);
   const qf=$('#quizFields');qf.innerHTML='';[...QFIELDS,'patterns'].forEach(k=>{if(k==='other'&&S.naming==='both')return;qf.append(chip('qf-'+k,labelOf(k),S.qf[k],v=>{S.qf[k]=v;save();resetQuiz()}))});
   $('#dir-'+S.dir).checked=true;$('#ans-'+S.ans).checked=true;$('#src-'+S.src).checked=true;$('#qm-'+S.mode).checked=true;
   $('#mk-'+S.mapKind).checked=true;$('#mm-'+S.mapMode).checked=true;
   $('#poolCount').textContent=pool().length+' of 78';
   $('#sumDetail').textContent={thoth:'Thoth',rws:'RWS',both:'Thoth+RWS'}[S.naming]+' · '+pool().length+' cards';
   const shown=FIELDS.filter(([k])=>S.show[k]&&!(k==='other'&&S.naming==='both')).map(([k])=>labelOf(k));
-  $('#dispSum').textContent=(shown.join(', ')||'nothing shown')+(S.hiddenMode==='reveal'?' · others tap to reveal':'');
+  $('#dispSum').textContent=(S.pics?'Pictures, ':'')+(shown.join(', ')||'nothing shown')+(S.hiddenMode==='reveal'?' · others tap to reveal':'');
   const fs=activeFields();$('#qoptsSum').textContent=(fs.map(labelOf).join(', ')+(S.qf.patterns?(fs.length?', ':'')+'patterns':''))||'nothing selected';
 }
 $$('input[name=naming]').forEach(r=>r.addEventListener('change',e=>{S.naming=e.target.value;save();buildSide();renderSpread();setRefView();if(TAB==='read')renderRead();resetQuiz();renderMap();buildMatchFields();newMatch();renderProgress()}));
+$('#picsToggle').addEventListener('change',e=>{S.pics=e.target.checked;save();buildSide();renderSpread();if(TAB==='read')renderRead()});
 $('#hiddenMode').addEventListener('change',e=>{S.hiddenMode=e.target.value;save();buildSide();renderSpread()});
 $$('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.preset;
   const set=(m,a,n,c)=>S.groups={major:!!m,ace:!!a,number:!!n,court:!!c};
@@ -993,6 +1031,7 @@ function renderSpread(){
     let h='<article class="tcard '+(showEl?elClass(c):'')+'" id="tc-'+i+'"><div class="band"></div><div class="tc-body">';
     h+='<div class="tc-top"><span>'+(def&&def.pos[i]?(i+1)+' · '+esc(def.pos[i][0]):'Position '+(i+1))+'</span>'+(s.rev?'<span class="rev">Reversed</span>':'')+'</div>';
     if(def&&def.pos[i])h+='<p class="tc-prompt">'+esc(def.pos[i][1])+'</p>';
+    if(S.pics&&nameShown)h+='<div class="tc-pic">'+picH(c,{rev:s.rev})+'</div>';
     h+=nameShown?'<h3 class="tc-name'+(!S.show.name?' shown-late':'')+'">'+esc(a)+(b?'<span class="tc-alt">RWS: '+esc(b)+'</span>':'')+'</h3>':'<button class="mask big" data-r="'+i+'|name">Reveal name</button>';
     h+='<dl class="facts">';
     FIELDS.forEach(([k])=>{if(k==='name')return;const v=val(c,k);if(v==null)return;const key=i+'|'+k;
@@ -1090,6 +1129,11 @@ function cardToFact(c,k){
   return{id:c.id,k,key:c.id+'|'+k,dir:'cf',eyebrow:labelOf(k),prompt:P,opts,answerH:deco(k,v),typeable:TYPEABLE(k)&&!(k==='sign'&&c.group==='court'),...acceptedFor(c,k)};
 }
 function factToCard(c,k){
+  if(k==='picture'){const same=CARDS.filter(x=>x.group===c.group&&x.id!==c.id);
+    const cand=same.map(x=>({x,s:(x.suit&&x.suit===c.suit?1:0)+(x.n&&x.n===c.n?1.5:0)+Math.random()*1.5})).sort((a,b)=>b.s-a.s).slice(0,6).map(o=>o.x);
+    const sys=S.naming==='both'?['thoth','rws']:[S.naming];
+    return{id:c.id,k,key:c.id+'|picture',dir:'fc',eyebrow:'RWS picture',prompt:'Which card is this?</p><div class="qpic">'+picH(c,{force:true})+'</div><p class="hint" style="margin:0">Pamela Colman Smith\u2019s 1909 design',
+      opts:shuffle([{h:esc(nameStr(c)),ok:true},...shuffle(cand).slice(0,3).map(x=>({h:esc(nameStr(x)),ok:false}))]),answerH:esc(nameStr(c)),typeable:true,cardAnswer:true,acc:sys.map(s=>nameIn(c,s))};}
   let key=k,v;
   if(c.group==='number'&&(k==='planet'||k==='sign')){key='decan';v=c.planet+' in '+c.sign;}
   else{v=val(c,k);if(v==null||k==='element'||k==='sephirah')return null;}
@@ -1204,6 +1248,7 @@ function validItems(src,fields){
 function grade(key,outcome){
   if(!key)return;
   const now=Date.now();const st=P.srs[key]||{b:0,due:0,n:0,r:0,t:0};
+  if(!P.srs[key]){if(!P.newLog||P.newLog.d!==todayStr())P.newLog={d:todayStr(),n:0};P.newLog.n++}
   let b=st.b||0;
   const early=st.due>now&&st.b>0; // reviewing ahead of schedule doesn't move an item up
   let due;
@@ -1218,7 +1263,8 @@ function smartItem(src,fields){
   const items=validItems(src,fields);if(!items.length)return null;
   const now=Date.now();
   const fresh=items.filter(it=>!QS.recentKeys.slice(-4).includes(it.key)&&!QS.recentIds.slice(-2).includes(it.id));
-  const list=fresh.length?fresh:items;
+  let list=fresh.length?fresh:items;
+  if(capReached()){const seen=list.filter(it=>P.srs[it.key]);if(!seen.length){const all=items.filter(it=>P.srs[it.key]);if(!all.length){QS.capHit=true;return null}list=all}else list=seen}
   const rank=it=>{const st=P.srs[it.key];
     if(QS.again[it.key]!=null&&QS.again[it.key]<=QS.count)return[0,QS.again[it.key]];
     if(st&&st.due<=now)return[1,st.b*1e13+st.due];
@@ -1228,6 +1274,8 @@ function smartItem(src,fields){
   const top=scored.filter(s=>s.r[0]===scored[0].r[0]).slice(0,3);
   return pick(top).it;
 }
+const newToday=()=>P.newLog&&P.newLog.d===todayStr()?P.newLog.n:0;
+const capReached=()=>S.newCap>0&&newToday()>=S.newCap;
 let DECK=[],DECK_KEY='',ROUND={n:0,size:0,done:0};
 function roundItem(src,fields){
   const items=validItems(src,fields);if(!items.length)return null;
@@ -1265,7 +1313,7 @@ function nextQ(fresh){
     if(!QS.daily)QS.daily={i:0,right:0,done:false,already:P.daily.last===todayStr()};
     if(QS.daily.i>=10){finishDaily();return}
   }
-  Q=makeQ();
+  QS.capHit=false;Q=makeQ();
   if(Q){QS.count++;if(Q.key){QS.recentKeys.push(Q.key);QS.recentIds.push(Q.id)}if(QS.recentKeys.length>12){QS.recentKeys.shift();QS.recentIds.shift()}}
   renderQ();renderScore();
 }
@@ -1273,7 +1321,7 @@ function boxLabel(){if(!Q||!Q.key)return'';const st=P.srs[Q.key];if(!st)return'n
 function renderQ(){
   const box=$('#qcard');
   if(!Q){
-    const why=!sourceCards().length?(S.src==='spread'?'Draw a spread first.':S.src==='missed'?'Nothing missed yet today. Switch “Cards from” back to Deck setting.':'No cards match the deck setting.'):'No questions fit these settings. Open Quiz settings and add a topic.';
+    const why=QS.capHit?'You\u2019ve met today\u2019s limit of '+S.newCap+' new items, and nothing you\u2019ve seen is due. Come back tomorrow, or raise the limit in Quiz settings.':!sourceCards().length?(S.src==='spread'?'Draw a spread first.':S.src==='missed'?'Nothing missed yet today. Switch “Cards from” back to Deck setting.':'No cards match the deck setting.'):'No questions fit these settings. Open Quiz settings and add a topic.';
     box.innerHTML='<p class="q-eyebrow">Quiz</p><p class="q-prompt">'+why+'</p>';return}
   const typed=S.ans==='type'&&Q.typeable&&S.mode!=='speed';
   let h='<div class="q-eyebrow"><span>'+esc(Q.eyebrow)+(Q.dir==='fc'?' → card':'')+'</span><span class="box">'+boxLabel()+'</span></div>';
@@ -1302,7 +1350,7 @@ function revealSelf(){
   const c=BYID[Q.id],elc=elClass(c);
   $('#qcard').className='qcard '+elc;
   $('#selfSlot').innerHTML='<div class="why answer '+elc+'"><span class="lbl">'+esc(labelOf(Q.k))+'</span><div>'+Q.answerH+'</div></div>';
-  $('#whySlot').innerHTML='<div class="why">'+explain(c)+'</div>';
+  $('#whySlot').innerHTML='<div class="why">'+picH(c,{cls:'whypic'})+explain(c)+'</div>';
   $('#hintBtn')?.remove();
   const acts=$('#acts');
   acts.innerHTML='<button class="btn" data-g="wrong">Missed</button><button class="btn" data-g="hinted">Close</button><button class="btn primary" data-g="knew">Got it</button>';
@@ -1332,7 +1380,7 @@ function finish(ok){
   const whyH=Q.dir==='pt'?Q.whyH:explain(BYID[Q.id]);
   const elc=Q.dir==='pt'?'el-spirit':elClass(BYID[Q.id]);
   $('#qcard').className='qcard '+elc;
-  $('#whySlot').innerHTML='<div class="why '+elc+'">'+whyH+'</div>';
+  $('#whySlot').innerHTML='<div class="why '+elc+'">'+(Q.dir!=='pt'&&Q.k!=='picture'?picH(BYID[Q.id],{cls:'whypic'}):'')+whyH+'</div>';
   const acts=$('#acts');acts.innerHTML='';
   const nextLbl=S.mode==='daily'&&QS.daily.i>=10?'See results':'Next';
   if(Q.key){
@@ -1388,7 +1436,7 @@ function renderScore(){
   if(S.mode==='speed'&&QS.speed&&QS.speed.active)h='<span class="timer" id="speedTimer">60s</span>'+pill(QS.speed.score,'correct')+pill(QS.speed.total,'answered');
   else{
     h=pill(QS.right+'/'+QS.total,'right')+pill(QS.streak,'in a row',QS.streak>=5)+pill(P.daily.streak||0,'day streak');
-    if(S.mode==='smart'||S.mode==='daily')h+=pill(countDue(),'due');
+    if(S.mode==='smart'||S.mode==='daily'){h+=pill(countDue(),'due');h+=pill(newToday()+(S.newCap?'/'+S.newCap:''),'new today',capReached())}
     if(S.mode==='rounds'&&ROUND.size)h+=pill(ROUND.done+'/'+ROUND.size,'round '+ROUND.n);
     if(S.mode==='daily'&&QS.daily)h+=pill(Math.min(QS.daily.i+(answered?0:1),10)+'/10','today');
   }
@@ -1399,6 +1447,7 @@ function countDue(){const src=S.mode==='daily'?pool():sourceCards();const items=
 function renderMissed(){const box=$('#missedBox');if(!MISSED.size||S.mode==='speed'){box.innerHTML='';return}
   box.innerHTML='<h2 class="sec">To review today</h2><ul>'+[...MISSED.values()].map(m=>'<li>'+esc(shortName(BYID[m.id]))+' <span>· '+esc(labelOf(m.k))+'</span></li>').join('')+'</ul><button class="btn" id="drillMissed">Drill these '+MISSED.size+'</button>';
   $('#drillMissed').addEventListener('click',()=>{S.src='missed';if(S.mode!=='smart'&&S.mode!=='rounds')S.mode='smart';save();buildSide();resetQuiz()});}
+$('#newCap').addEventListener('change',e=>{S.newCap=+e.target.value;save();renderScore();if(!Q)nextQ()});
 $$('input[name=dir]').forEach(r=>r.addEventListener('change',e=>{S.dir=e.target.value;save();resetQuiz()}));
 $$('input[name=ans]').forEach(r=>r.addEventListener('change',e=>{S.ans=e.target.value;save();nextQ()}));
 $$('input[name=src]').forEach(r=>r.addEventListener('change',e=>{S.src=e.target.value;save();resetQuiz()}));
@@ -1575,7 +1624,7 @@ document.addEventListener('keydown',e=>{if(TAB!=='maps'||S.mapMode!=='find'||!MA
 
 /* ---------- matching game ---------- */
 const M={pairs:[],left:[],right:[],sel:null,done:new Set(),miss:0,start:0,end:0,flash:null};
-const matchFields=()=>QFIELDS.filter(k=>!(k==='other'&&S.naming==='both')&&k!=='rwsup'&&k!=='rwsrev');
+const matchFields=()=>QFIELDS.filter(k=>!(k==='other'&&S.naming==='both')&&k!=='rwsup'&&k!=='rwsrev'&&k!=='picture');
 function buildMatchFields(){
   const box=$('#matchField');box.innerHTML='';
   const fs=matchFields().filter(k=>usablePairs(k).length>=4);
@@ -1639,7 +1688,7 @@ function renderProgress(){
   $('#legend').innerHTML='<span><i class="lv0"></i>not seen</span><span><i class="lv1"></i>missed / learning</span><span><i class="lv2"></i>1 day</span><span><i class="lv3"></i>3 days</span><span><i class="lv4"></i>1 week</span><span><i class="lv5"></i>2 weeks</span><span><i class="lv6"></i>mastered</span>';
   const cols=QFIELDS.filter(k=>!(k==='other'&&S.naming==='both'));
   const groups=[['Trumps',c=>c.group==='major','spirit'],...SUITS.map(s=>[suitLabel(s.id),c=>c.suit===s.id,s.el.toLowerCase()])];
-  let h='<thead><tr><th>Card</th>'+cols.map(k=>'<th>'+esc(labelOf(k).replace(' letter','').replace('Esoteric title','Esoteric').replace('Decan dates','Dates').replace('Thoth keywords','Thoth kw').replace('RWS meaning','RWS up').replace('RWS reversed','RWS rev'))+'</th>').join('')+'</tr></thead><tbody>';
+  let h='<thead><tr><th>Card</th>'+cols.map(k=>'<th>'+esc(labelOf(k).replace(' letter','').replace('Esoteric title','Esoteric').replace('Decan dates','Dates').replace('Thoth keywords','Thoth kw').replace('RWS meaning','RWS up').replace('RWS reversed','RWS rev').replace('RWS picture','Picture'))+'</th>').join('')+'</tr></thead><tbody>';
   groups.forEach(([gname,f,el])=>{const cs=CARDS.filter(c=>f(c)&&inPool(c)).sort((a,b)=>a.order-b.order);if(!cs.length)return;
     let gt=0,gs=0,gn=0;cs.forEach(c=>cols.forEach(k=>{const key=c.id+'|'+k;if(!A[key])return;gt++;const s=P.srs[key];if(s){gn++;if(s.b>=4)gs++}}));
     h+='<tr class="grp"><td colspan="'+(cols.length+1)+'"><span class="dot '+el+'"></span>'+esc(gname)+'<span class="gsum">'+gs+' strong · '+gn+' seen · '+gt+' items</span></td></tr>';
@@ -1713,7 +1762,7 @@ const DG={cards:[],answered:false,picked:null,score:0,total:0};
 function digPool(){const p=pool();return p.length>=3?p:CARDS}
 function newDig(){const n=S.digMode==='pair'?2:3;DG.cards=shuffle(digPool()).slice(0,n);DG.answered=false;DG.picked=null;renderRead()}
 function miniCard(c,i,opts={}){const show=opts.showEl;const rev=opts.rev;
-  return '<div class="mini '+(show?(elemOf(c)?'el-'+elemOf(c).toLowerCase():'el-spirit'):'')+(opts.mid?' mid':'')+'"><div class="band"></div><div class="in"><span class="pos"><span>'+(opts.label||('Card '+(i+1)))+'</span>'+(rev?'<span class="rev">Reversed</span>':'')+'</span><span class="nm">'+esc(shortName(c))+'</span>'+(show?'<span class="el">'+elName(c)+'</span>':'')+'</div></div>'}
+  return '<div class="mini '+(show?(elemOf(c)?'el-'+elemOf(c).toLowerCase():'el-spirit'):'')+(opts.mid?' mid':'')+'"><div class="band"></div><div class="in"><span class="pos"><span>'+(opts.label||('Card '+(i+1)))+'</span>'+(rev?'<span class="rev">Reversed</span>':'')+'</span>'+(S.pics?'<div class="tc-pic">'+picH(c,{rev})+'</div>':'')+'<span class="nm">'+esc(shortName(c))+'</span>'+(show?'<span class="el">'+elName(c)+'</span>':'')+'</div></div>'}
 function renderDignities(){
   if(!DG.cards.length||DG.cards.length!==(S.digMode==='pair'?2:3)){const n=S.digMode==='pair'?2:3;DG.cards=shuffle(digPool()).slice(0,n);DG.answered=false}
   const cs=DG.cards,pair=S.digMode==='pair';
@@ -1811,8 +1860,9 @@ function renderJournal(){
   const js=(P.journal||[]).slice().sort((a,b)=>b.t-a.t);
   let h='';
   if(!js.length)h='<div class="empty">No readings saved yet. Do a Guided reading or a Quick reading and save it to see it here.</div>';
-  else h='<p class="note">'+js.length+' saved reading'+(js.length===1?'':'s')+'. They are part of your progress file, so save one now and then to keep a copy.</p><div class="jlist">'+js.map(j=>'<div class="jentry"><span class="meta">'+new Date(j.t).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})+(j.kind==='guided'?' · '+esc(j.layout==='free'?'Free draw':layoutDef(j.layout).name):'')+' · '+j.cards.map(x=>esc(shortName(BYID[x.id]))+(x.rev?' (rev.)':'')).join(' · ')+'</span>'+(j.q?'<div class="qtext">'+esc(j.q)+'</div>':'')+'<div class="txt">'+esc(j.text||'')+'</div><div class="acts" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-jopen="'+j.id+'">Open</button><button class="btn quiet" data-jdel="'+j.id+'">'+(jDelArmed===j.id?'Tap again to delete':'Delete')+'</button></div></div>').join('')+'</div>';
+  else h='<div class="modebar"><p class="note" style="margin:0">'+js.length+' saved reading'+(js.length===1?'':'s')+'. They are part of your progress file; you can also export them as a readable document.</p><button class="btn" id="jExport">Export journal (.md)</button><span class="fb" id="jMsg"></span></div><div class="jlist">'+js.map(j=>'<div class="jentry"><span class="meta">'+new Date(j.t).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})+(j.kind==='guided'?' · '+esc(j.layout==='free'?'Free draw':layoutDef(j.layout).name):'')+' · '+j.cards.map(x=>esc(shortName(BYID[x.id]))+(x.rev?' (rev.)':'')).join(' · ')+'</span>'+(j.q?'<div class="qtext">'+esc(j.q)+'</div>':'')+'<div class="txt">'+esc(j.text||'')+'</div><div class="acts" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-jopen="'+j.id+'">Open</button><button class="btn quiet" data-jdel="'+j.id+'">'+(jDelArmed===j.id?'Tap again to delete':'Delete')+'</button></div></div>').join('')+'</div>';
   $('#readBody').innerHTML=h;
+  $('#jExport')?.addEventListener('click',exportJournal);
   $$('[data-jopen]').forEach(b=>b.addEventListener('click',()=>{const j=P.journal.find(x=>x.id===b.dataset.jopen);if(!j)return;
     if(j.kind==='guided'){openGuided(j);S.readMode='guided';save();renderRead();return}
     SY.cards=j.cards.slice();SY.text=j.text;SY.revealed=true;SY.openId=j.id;SY.source='journal';S.readMode='synthesis';save();renderRead()}));
@@ -2004,7 +2054,7 @@ function renderGuided(){
     h+='<span class="q-eyebrow"><span>Step 4 · Positions</span></span><p class="note" style="margin:0">Read each card in its position. Write your reading first, then check it against the keywords, Waite’s meaning and the card’s dignity.</p>';
     h+=layoutH(def,GR.cards,{mode:'cards',showEl:true});
     h+=cs.map((c,i)=>{const r=GR.cards[i].rev;const d=digAt(def,cs,i);
-      return '<div class="gblock"><span class="posname">'+(i+1)+' · '+esc(def.pos[i][0])+(def.pos[i][1]?' — '+esc(def.pos[i][1]):'')+'</span><h4>'+esc(shortName(c))+(r?' <span class="rev" style="font-size:.7rem">Reversed</span>':'')+'</h4>'+
+      return '<div class="gblock"><span class="posname">'+(i+1)+' · '+esc(def.pos[i][0])+(def.pos[i][1]?' — '+esc(def.pos[i][1]):'')+'</span>'+(S.pics?'<div class="gpic">'+picH(c,{rev:r})+'</div>':'')+'<h4>'+esc(shortName(c))+(r?' <span class="rev" style="font-size:.7rem">Reversed</span>':'')+'</h4>'+
         '<textarea class="reading sm" data-gpos="'+i+'" placeholder="What does this card say in this position?">'+esc(GR.pos[i]||'')+'</textarea>'+
         (GR.shown[i]?'<div class="why">'+meaningH(c,r,d)+'</div>':'<div><button class="btn quiet" data-gshow="'+i+'">Show meanings</button></div>')+'</div>'}).join('');
     h+=nav(true,true);
@@ -2059,6 +2109,73 @@ function openGuided(j){GR=blankGR();Object.assign(GR,{layout:j.layout,cards:j.ca
   j.cards.forEach((_,i)=>GR.shown[i]=true);(layoutDef(j.layout).pairs||[]).forEach((_,k)=>GR.relShown[k]=true);
   if(j.layout==='free')freeDef(j.cards.length).pairs.forEach((_,k)=>GR.relShown[k]=true);}
 
+
+/* ---------- journal export: a readable Markdown document ---------- */
+function journalMd(){
+  const js=(P.journal||[]).slice().sort((a,b)=>a.t-b.t);
+  const nm=x=>{const c=BYID[x.id];const t=nameIn(c,'thoth'),r=nameIn(c,'rws');return (t===r?t:t+' / '+r)+(x.rev?' (reversed)':'')};
+  const fmtD=t=>new Date(t).toLocaleDateString(undefined,{weekday:'short',year:'numeric',month:'long',day:'numeric'});
+  const q=x=>String(x||'').trim();
+  let md='# Tarot journal\n\nExported '+fmtD(Date.now())+' · '+js.length+' reading'+(js.length===1?'':'s')+'\n';
+  js.forEach(j=>{
+    const def=j.kind==='guided'?(j.layout==='free'?freeDef(j.cards.length):layoutDef(j.layout)):null;
+    md+='\n---\n\n## '+fmtD(j.t)+(def?' · '+def.name:' · Quick reading')+'\n\n';
+    if(q(j.q))md+='**Question:** '+q(j.q)+'\n\n';
+    md+='**Cards**\n\n'+j.cards.map((x,i)=>(i+1)+'. '+(def&&def.pos[i]?def.pos[i][0]+': ':'')+nm(x)).join('\n')+'\n\n';
+    if(j.kind==='guided'){
+      if(q(j.imp))md+='**First look:** '+q(j.imp)+'\n\n';
+      const ps=j.cards.map((x,i)=>q((j.pos||{})[i])?'- **'+(i+1)+'. '+(def.pos[i]?def.pos[i][0]:'')+'** ('+nm(x)+'): '+q(j.pos[i]):'').filter(Boolean);
+      if(ps.length)md+='**Positions**\n\n'+ps.join('\n')+'\n\n';
+      const rs=(def.pairs||[]).map(([a,b,pr],k)=>q((j.rel||{})[k])?'- **'+(a+1)+' and '+(b+1)+', '+pr.charAt(0).toLowerCase()+pr.slice(1)+':** '+q(j.rel[k]):'').filter(Boolean);
+      if(rs.length)md+='**Relationships**\n\n'+rs.join('\n')+'\n\n';
+      if(q(j.sum))md+='**Summary:** '+q(j.sum)+'\n\n';
+      if(q(j.adv))md+='**Advice:** '+q(j.adv)+'\n\n';
+    }else if(q(j.text))md+='**Reading:** '+q(j.text)+'\n\n';
+  });
+  return md;
+}
+async function exportJournal(){const msg=$('#jMsg');msg.className='fb';msg.textContent='';
+  try{await saveTextFile('tarot-journal-'+todayStr()+'.md',journalMd(),'text/markdown');msg.className='fb ok';msg.textContent='Journal exported.'}
+  catch(e){msg.className='fb no';msg.textContent=saveErr(e)}}
+
+/* ---------- Start here guide ---------- */
+function setupPractice(groups,fields,mode){GROUPS.forEach(([g])=>S.groups[g]=groups.includes(g));SUITS.forEach(x=>S.suits[x.id]=true);
+  QFIELDS.forEach(k=>S.qf[k]=fields.includes(k));S.mode=mode||'smart';S.src='pool';save();buildSide();renderRef();draw();hideGuide();showTab('quiz');resetQuiz()}
+const GUIDE_ACTIONS={
+  s1quiz:()=>setupPractice(['ace','number'],['title','element','sephirah']),
+  s1match:()=>{GROUPS.forEach(([g])=>S.groups[g]=['ace','number'].includes(g));SUITS.forEach(x=>S.suits[x.id]=true);S.matchField='title';save();buildSide();buildMatchFields();newMatch();hideGuide();showTab('match')},
+  s1spread:()=>{GROUPS.forEach(([g])=>S.groups[g]=['ace','number'].includes(g));SUITS.forEach(x=>S.suits[x.id]=true);S.layout='ppf';Object.keys(S.show).forEach(k=>S.show[k]=['name','title','element'].includes(k));save();$('#layoutSel').value='ppf';buildSide();draw();hideGuide();showTab('spread')},
+  s2quiz:()=>setupPractice(['major','court'],['number','element','hebrew','planet','sign','sephirah','other']),
+  s2tree:()=>{S.mapKind='tree';S.mapMode='find';save();buildSide();MAP.q=null;MAP.paint=null;hideGuide();showTab('maps')},
+  s3quiz:()=>setupPractice(['number','court'],['planet','sign','dates']),
+  s3wheel:()=>{S.mapKind='wheel';S.mapMode='find';save();buildSide();MAP.q=null;MAP.paint=null;hideGuide();showTab('maps')},
+  mquiz:()=>setupPractice(['major','ace','number','court'],['thothkw','rwsup','picture']),
+  mkw:()=>{S.refView='kw';save();hideGuide();showTab('ref');setRefView()},
+  rpos:()=>{S.readMode='positions';save();hideGuide();showTab('read')},
+  rdig:()=>{S.readMode='dignities';save();hideGuide();showTab('read')},
+  rguided:()=>{S.readMode='guided';save();hideGuide();showTab('read')},
+  daily:()=>{S.mode='daily';S.src='pool';save();buildSide();hideGuide();showTab('quiz');resetQuiz()},
+  backup:()=>{hideGuide();showTab('progress');setTimeout(()=>$('.backup')?.scrollIntoView({behavior:'smooth'}),50)}
+};
+function renderGuide(){
+  const b=(k,t,primary)=>'<button class="btn'+(primary?' primary':'')+'" data-ga="'+k+'">'+t+'</button>';
+  $('#guide').innerHTML='<div class="gtop"><h2>Start here</h2><button class="link" id="guideClose">Hide this guide</button></div>'+
+  '<p class="note" style="margin:0">The drill follows your plan: three stages of about twelve weeks, with meanings and reading practice running alongside. Each button sets up the right cards and topics for you; your deck setting changes to match.</p>'+
+  '<div class="gcards">'+
+  '<div class="gcard"><h3>Stage 1 · Numbered cards</h3><ul><li>Learn the Aces and 2–10: Thoth titles, elements and Sephiroth.</li><li>Match boards make the titles stick.</li><li>Practise reading short spreads with just the title and element showing.</li></ul><div class="acts">'+b('s1quiz','Quiz',true)+b('s1match','Match titles')+b('s1spread','Three-card spreads')+'</div></div>'+
+  '<div class="gcard"><h3>Stage 2 · Courts and Majors</h3><ul><li>Trump numbers, Hebrew letters and attributions; court elements and Sephiroth; the other deck’s names.</li><li>Find each trump’s path on the Tree of Life.</li></ul><div class="acts">'+b('s2quiz','Quiz',true)+b('s2tree','Tree of Life')+'</div></div>'+
+  '<div class="gcard"><h3>Stage 3 · Astrology and decans</h3><ul><li>Decan planets, signs and dates; court zodiac spans.</li><li>Place cards on the zodiac wheel. Pattern questions teach the Chaldean order so you can work decans out.</li></ul><div class="acts">'+b('s3quiz','Quiz',true)+b('s3wheel','Zodiac wheel')+'</div></div>'+
+  '<div class="gcard"><h3>Meanings, alongside every stage</h3><ul><li>Rewrite the starter Thoth keywords in your own words as you study each card.</li><li>Recall your keywords and Waite’s meanings; name cards from their RWS pictures.</li></ul><div class="acts">'+b('mquiz','Quiz meanings',true)+b('mkw','Edit keywords')+'</div></div>'+
+  '<div class="gcard"><h3>Reading practice</h3><ul><li>Learn spread positions and elemental dignities first.</li><li>Then do a guided reading each week and save it to your journal.</li></ul><div class="acts">'+b('rguided','Guided reading',true)+b('rpos','Positions')+b('rdig','Dignities')+'</div></div>'+
+  '<div class="gcard"><h3>A simple routine</h3><ul><li>Daily: the Daily ten (about five minutes), and one card of the day.</li><li>Weekly: one guided reading, then save a progress file so nothing is lost.</li><li>Progress lives in this browser only until you save that file.</li></ul><div class="acts">'+b('daily','Daily ten',true)+b('backup','Save progress')+'</div></div>'+
+  '</div><p class="hint" style="margin:0">Pictures are Pamela Colman Smith’s 1909 Rider–Waite–Smith designs (public domain). The Thoth paintings are still under copyright, so they are not included.</p>';
+  $('#guideClose').addEventListener('click',hideGuide);
+  $$('[data-ga]').forEach(x=>x.addEventListener('click',()=>GUIDE_ACTIONS[x.dataset.ga]()));
+}
+function showGuide(){renderGuide();$('#guide').hidden=false;$('#guide').scrollIntoView({behavior:'smooth',block:'start'})}
+function hideGuide(){$('#guide').hidden=true;try{localStorage.setItem('tarot-guide-seen','1')}catch(e){}}
+$('#guideBtn').addEventListener('click',()=>{$('#guide').hidden?showGuide():hideGuide()});
+
 /* ---------- phone: settings start folded ---------- */
 const mq=window.matchMedia('(max-width:860px)');
 const fitPanel=()=>{$('#settings').open=!mq.matches};
@@ -2067,6 +2184,7 @@ $('#settings').addEventListener('toggle',e=>{if(!mq.matches&&!e.target.open)e.ta
 
 /* ---------- boot ---------- */
 buildSide();syncSpreadSeg();draw();renderRef();buildMatchFields();newMatch();nextQ(true);renderMissed();renderBackup();
+try{if(!localStorage.getItem('tarot-guide-seen')&&!(P.stats&&P.stats.n)){renderGuide();$('#guide').hidden=false}}catch(e){}
 })();
 </script>
 <script>

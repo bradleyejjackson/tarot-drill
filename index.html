@@ -189,6 +189,8 @@ textarea.reading.sm{min-height:70px}
 .tc-pic{max-width:150px;margin:0 auto}
 .mini .tc-pic{max-width:110px;margin:2px auto 4px}
 .qpic{max-width:220px;margin:0 auto}
+.arrien{display:block;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:.86rem;color:var(--muted)}
+.arrien b{color:var(--gilt)}
 .why .whypic{float:right;width:84px;margin:0 0 8px 12px}
 .why::after{content:"";display:block;clear:both}
 .gblock .gpic{float:left;width:86px;margin:2px 14px 6px 0}
@@ -760,7 +762,7 @@ const NUMBERED=CARDS.filter(c=>c.group==='number');
 const BYDEC=[];NUMBERED.forEach(c=>BYDEC[c.dec]=c);
 
 const GROUPS=[['major','Trumps (Major)'],['ace','Aces'],['number','Numbered 2–10'],['court','Courts']];
-const FIELDS=[['name','Name'],['number','Number'],['suit','Suit'],['element','Element'],['planet','Planet'],['sign','Sign'],['title','Title'],['hebrew','Hebrew letter'],['sephirah','Sephirah'],['dates','Decan dates'],['esoteric','Esoteric title'],['other','Other deck’s name'],['thothkw','Thoth keywords'],['rwsup','RWS meaning'],['rwsrev','RWS reversed'],['picture','RWS picture']];
+const FIELDS=[['name','Name'],['number','Number'],['suit','Suit'],['element','Element'],['planet','Planet'],['sign','Sign'],['title','Title'],['hebrew','Hebrew letter'],['sephirah','Sephirah'],['dates','Decan dates'],['esoteric','Esoteric title'],['other','Other deck’s name'],['thothkw','Thoth keywords'],['rwsup','RWS meaning'],['rwsrev','RWS reversed'],['picture','RWS picture'],['arrien','Arrien note']];
 const QFIELDS=['number','element','planet','sign','title','hebrew','sephirah','dates','esoteric','other','thothkw','rwsup','rwsrev','picture'];
 const STAGES=[
  {id:1,name:'Stage 1 · Numbered cards',desc:'Aces and 2–10: titles, elements, sephiroth',groups:['ace','number'],fields:['title','element','sephirah']},
@@ -770,7 +772,7 @@ const STAGES=[
 
 /* ---------- settings (per device) ---------- */
 const DEF={naming:'thoth',groups:{major:true,ace:true,number:true,court:true},suits:{wands:true,cups:true,swords:true,disks:true},
-  show:{name:true,number:true,suit:true,element:true,planet:false,sign:false,title:false,hebrew:false,sephirah:false,dates:false,esoteric:false,other:false,thothkw:false,rwsup:false,rwsrev:false},
+  show:{name:true,number:true,suit:true,element:true,planet:false,sign:false,title:false,hebrew:false,sephirah:false,dates:false,esoteric:false,other:false,thothkw:false,rwsup:false,rwsrev:false,arrien:false},
   hiddenMode:'reveal',spreadN:3,reversals:false,
   qf:{number:true,element:true,planet:true,sign:true,title:true,hebrew:false,sephirah:false,dates:false,esoteric:false,other:false,thothkw:false,rwsup:false,rwsrev:false,picture:false,patterns:true},
   dir:'mix',ans:'choice',src:'pool',mode:'smart',mapKind:'wheel',mapMode:'explore',matchField:'title',readMode:'guided',layout:'free',newCap:20,pics:true,scanLayout:'celtic',digMode:'triad',digShowEl:false,synN:3,refView:'table'};
@@ -879,6 +881,7 @@ function val(c,k){
     case 'rwsup':return RWSM[c.id]?RWSM[c.id][0]:null;
     case 'rwsrev':return RWSM[c.id]?RWSM[c.id][1]:null;
     case 'picture':return null;
+    case 'arrien':return arrienNote(c);
     default:return c[k]??null;
   }
 }
@@ -905,10 +908,33 @@ const inPool=c=>S.groups[c.group]&&(c.group==='major'||S.suits[c.suit]);
 const pool=()=>CARDS.filter(inPool);
 const B=s=>'<b>'+s+'</b>';
 
+
+/* Where Angeles Arrien's Tarot Handbook (1987) differs from Book T: facts only, noted on the card; the drill still teaches Book T. */
+const ARR_COURT={wandsKnight:['Fire'],wandsQueen:['Water',['Pisces']],wandsPrince:['Earth',['Leo']],wandsPrincess:['Air',['Aries']],
+ cupsKnight:['Air',['Cancer']],cupsQueen:['Earth'],cupsPrince:['Water',['Scorpio']],cupsPrincess:['Fire'],
+ swordsKnight:['Water',['Aquarius','Gemini','Libra']],swordsQueen:['Air'],swordsPrince:['Fire',['Aquarius']],swordsPrincess:['Earth'],
+ disksKnight:['Earth',['Leo']],disksQueen:['Fire',['Aries']],disksPrince:['Air',['Taurus']],disksPrincess:['Water',['Scorpio','Aries']]};
+const ARR_ACE={wands:['Aries','Leo','Sagittarius'],cups:['Cancer','Scorpio','Pisces'],swords:['Libra','Aquarius','Gemini'],disks:['Capricorn','Taurus','Virgo']};
+function arrienNote(c){
+  if(c.group==='court'){const a=ARR_COURT[c.id];if(!a)return null;const el=SUIT[c.suit].el;const elOK=a[0]===c.rank.sub;
+    const bt=new Set(c.decs.map(d=>SIGNS[Math.floor(d/3)]));const sg=a[1]||[];const inSpan=sg.filter(x=>bt.has(x));
+    let t='Arrien gives it as '+a[0]+' of '+el+(sg.length?', with '+sg.join(', ').replace(/, ([^,]*)$/,' and $1'):'')+'. ';
+    t+=elOK?'Her element matches Book T':'Book T has '+c.element;
+    if(sg.length)t+=inSpan.length===sg.length?'; her sign'+(sg.length>1?'s fall':' falls')+' within the Book T span.':inSpan.length?'; only '+inSpan.join(' and ')+' falls within the Book T span.':'; her sign'+(sg.length>1?'s fall':' falls')+' outside the Book T span.';
+    else t+='.';
+    return elOK&&(!sg.length||inSpan.length===sg.length)?null:t;}
+  if(c.group==='ace')return 'Arrien ties it to the three '+c.element+' sign-months ('+ARR_ACE[c.suit].join(', ')+') and reads it as a year; Book T makes it the root of '+c.element+'.';
+  if(c.id==='M0')return 'Arrien’s summary also links the Fool to Aries (March 21 to April 21) through Dionysus as a spring god; her Fool chapter keeps Aleph and Air.';
+  if(c.id==='M20')return 'Arrien’s summary calls the Aeon Leo, a fire card; Book T gives it Fire (Shin), and Leo belongs to Lust.';
+  if(c.id==='wands9')return 'Arrien reads it as Sun and Moon in Sagittarius, from both symbols on the card; Book T gives Moon in Sagittarius.';
+  return null;
+}
+
 /* ---------- explanations & hints ---------- */
 const pathOf=c=>LETTERS.indexOf(S.naming==='both'?c.heb:hebKeyOf(c))+11;
 function decanCardsH(decs){return decs.map(d=>esc(shortName(BYDEC[d]))).join(', ')}
-function explain(c){
+function explain(c){const a=arrienNote(c);return explainBT(c)+(a?'<span class="arrien"><b>Arrien:</b> '+esc(a)+'</span>':'')}
+function explainBT(c){
   const N=B(esc(shortName(c)));
   if(c.group==='number'){const si=SIGNS.indexOf(c.sign),d=c.dec%3;
     return N+' is '+B(deco('decan',c.planet+' in '+c.sign))+', the '+ORD[d]+' decan of '+c.sign+' (a '+MODS[si%3]+' '+SIGN_EL[c.sign]+' sign). As a '+c.n+' it sits in '+c.sephirah+', and its Thoth title is '+B(esc(c.title))+'. The Sun passes through it about '+esc(c.dates)+'.';}
@@ -1718,7 +1744,7 @@ function renderRef(){
   $('#refTable').innerHTML='<thead><tr>'+cols.map(([k])=>'<th>'+esc(labelOf(k))+'</th>').join('')+'</tr></thead><tbody>'+
    rows.map(c=>'<tr>'+cols.map(([k])=>{const v=val(c,k);
      if(k==='name')return'<td class="nm"><span class="dot '+elClass(c).slice(3)+'"></span>'+esc(v)+'</td>';
-     return'<td class="'+(k==='number'||k==='dates'?'mono':MEANING.includes(k)?'long':'')+'">'+(v==null?'<span style="color:var(--muted)">–</span>':deco(k,v))+'</td>'}).join('')+'</tr>').join('')+'</tbody>';
+     return'<td class="'+(k==='number'||k==='dates'?'mono':MEANING.includes(k)||k==='arrien'?'long':'')+'">'+(v==null?'<span style="color:var(--muted)">–</span>':deco(k,v))+'</td>'}).join('')+'</tr>').join('')+'</tbody>';
 }
 
 

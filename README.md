@@ -95,6 +95,8 @@ RWS divinatory meanings are from A. E. Waite, *The Pictorial Key to the Tarot* (
 
 Attributions follow the Hermetic Order of the Golden Dawn's *Book T* as used in Aleister Crowley's Thoth deck: decans and their Thoth titles, court card zodiac spans, Book T esoteric titles, and the Hebrew letter paths on the Tree of Life. Decan dates are approximate and shift by a day or so each year.
 
+Where Angeles Arrien's *The Tarot Handbook* (1987) gives a different attribution, mainly the court cards' elements and signs, the Aces, the Fool, the Aeon and the Nine of Wands, the app notes her version on the card and in the Reference table. The drill itself teaches Book T.
+
 If you find an attribution that doesn't match your sources, please open an issue.
 
 ---

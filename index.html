@@ -159,6 +159,31 @@ details.qopts[open] > summary::after{content:"Hide"}
 .why b{font-weight:700}
 .why.answer{background:var(--surface);border:1px solid var(--line);font-size:1rem;display:flex;flex-direction:column;gap:4px}
 table.ref td.long{min-width:240px;max-width:340px;font-size:.78rem;line-height:1.45}
+.layout{display:grid;gap:8px;max-width:620px;margin:0 auto 18px}
+.lcell{position:relative;min-height:66px;border:1px solid var(--line);border-top:4px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:2px;text-align:left;font:inherit;color:inherit;cursor:pointer;min-width:0}
+.lcell:hover{border-color:var(--accent)}
+.lcell.el-fire{border-top-color:var(--fire)}.lcell.el-water{border-top-color:var(--water)}.lcell.el-air{border-top-color:var(--air)}.lcell.el-earth{border-top-color:var(--earth)}.lcell.el-spirit{border-top-color:var(--spirit)}
+.lcell .ln{font-family:var(--f-mono);font-size:.7rem;color:var(--muted)}
+.lcell .lnm{font-size:.8rem;line-height:1.25;overflow-wrap:anywhere}
+.lcell.crossing{align-self:end;min-height:0;margin:0 -12px -14px;z-index:1;background:var(--sunk);flex-direction:row;gap:6px;align-items:baseline;box-shadow:0 2px 6px rgb(0 0 0 / .18)}
+.lcell.hl{box-shadow:0 0 0 2px var(--accent);z-index:2}
+.lcell.hascross{min-height:96px}
+.lcell.crossing .ln{white-space:nowrap}
+.lcell.crossing .lnm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.lcell.ok{background:var(--ok-bg);border-color:var(--ok)} .lcell.bad{background:var(--bad-bg);border-color:var(--bad)}
+.layout.dense .lnm{font-size:.7rem}
+.tc-prompt{margin:0;font-size:.8rem;color:var(--muted);font-style:italic}
+.steps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.steps button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:.8rem;color:var(--muted);cursor:pointer}
+.steps button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.steps button.done{color:var(--ink)}
+.gblock{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:8px}
+.gblock:first-child{border-top:0;padding-top:0}
+.gblock h4{margin:0;font-family:var(--f-display);font-weight:400;font-size:1.15rem;display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
+.gblock .posname{font-family:var(--f-body);font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700}
+textarea.reading.sm{min-height:70px}
+.qtext{font-family:var(--f-display);font-size:1.2rem}
+.scanq{display:flex;flex-direction:column;gap:12px}
 .minicards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .mini{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
 .mini .band{height:6px;background:var(--line)}
@@ -316,7 +341,17 @@ table.ref td.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;wh
 .foot{margin-top:28px;color:var(--muted);font-size:.78rem;max-width:70ch}
 @media (prefers-reduced-motion:no-preference){.tcard{animation:deal .35s ease both}@keyframes deal{from{transform:translateY(6px)}to{transform:none}}}
 
+@media (max-width:600px){
+  .layout.dense .lnm{display:none}
+  .lcell{min-height:52px;padding:5px 6px}
+  .lcell .lnm{font-size:.72rem}
+  .lcell.hascross{min-height:84px}
+  .lcell.crossing{margin:0 -8px -10px}
+  .lcell.crossing .lnm{display:none}
+}
 @media (max-width:860px){
+  #readSeg{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  #readSeg span{text-align:center}
   .backup-acts .btn{flex:1 1 100%;text-align:center}
   body{padding-inline:max(16px, env(safe-area-inset-left,0px))}
   header.top{display:contents}
@@ -420,6 +455,10 @@ table.ref td.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;wh
     <div class="toolbar">
       <button class="btn primary" id="draw">Draw</button>
       <div class="group">
+        <label class="lbl" for="layoutSel">Spread</label>
+        <select id="layoutSel"></select>
+      </div>
+      <div class="group" id="cardsGroup">
         <span class="lbl">Cards</span>
         <div class="spreadpick"><div class="seg" id="spreadSeg"></div><input class="num-in" type="number" id="customN" min="1" max="22" aria-label="Number of cards" hidden></div>
       </div>
@@ -446,6 +485,7 @@ table.ref td.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;wh
       </div>
     </details>
     <p class="note" id="spreadNote"></p>
+    <div id="layoutBox"></div>
     <div class="spread" id="spread"></div>
   </section>
 
@@ -498,9 +538,12 @@ table.ref td.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;wh
   <!-- READ -->
   <section id="tab-read" hidden>
     <div class="modebar">
-      <div class="seg">
+      <div class="seg" id="readSeg">
+        <label><input type="radio" name="readmode" id="rm-guided" value="guided"><span>Guided reading</span></label>
+        <label><input type="radio" name="readmode" id="rm-synthesis" value="synthesis"><span>Quick reading</span></label>
+        <label><input type="radio" name="readmode" id="rm-scan" value="scan"><span>Spread scan</span></label>
+        <label><input type="radio" name="readmode" id="rm-positions" value="positions"><span>Positions</span></label>
         <label><input type="radio" name="readmode" id="rm-dignities" value="dignities"><span>Dignities</span></label>
-        <label><input type="radio" name="readmode" id="rm-synthesis" value="synthesis"><span>Practice reading</span></label>
         <label><input type="radio" name="readmode" id="rm-journal" value="journal"><span>Journal</span></label>
       </div>
       <span class="hint" id="readNote"></span>
@@ -704,7 +747,7 @@ const DEF={naming:'thoth',groups:{major:true,ace:true,number:true,court:true},su
   show:{name:true,number:true,suit:true,element:true,planet:false,sign:false,title:false,hebrew:false,sephirah:false,dates:false,esoteric:false,other:false,thothkw:false,rwsup:false,rwsrev:false},
   hiddenMode:'reveal',spreadN:3,reversals:false,
   qf:{number:true,element:true,planet:true,sign:true,title:true,hebrew:false,sephirah:false,dates:false,esoteric:false,other:false,thothkw:false,rwsup:false,rwsrev:false,patterns:true},
-  dir:'mix',ans:'choice',src:'pool',mode:'smart',mapKind:'wheel',mapMode:'explore',matchField:'title',readMode:'dignities',digMode:'triad',digShowEl:false,synN:3,refView:'table'};
+  dir:'mix',ans:'choice',src:'pool',mode:'smart',mapKind:'wheel',mapMode:'explore',matchField:'title',readMode:'guided',layout:'free',scanLayout:'celtic',digMode:'triad',digShowEl:false,synN:3,refView:'table'};
 let S=JSON.parse(JSON.stringify(DEF));
 try{const raw=localStorage.getItem('tarot-drill-v1');if(raw){const o=JSON.parse(raw);for(const k in DEF){if(o[k]!==undefined){S[k]=(typeof DEF[k]==='object')?Object.assign({},DEF[k],o[k]):o[k]}}}}catch(e){}
 const save=()=>{try{localStorage.setItem('tarot-drill-v1',JSON.stringify(S))}catch(e){}};
@@ -935,17 +978,21 @@ function syncSpreadSeg(){const preset=SPREADS.some(([n])=>n===S.spreadN);
 $('#customN').addEventListener('change',e=>{let n=Math.max(1,Math.min(22,parseInt(e.target.value)||1));S.spreadN=n;syncSpreadSeg();save();draw()});
 $('#reversals').addEventListener('change',e=>{S.reversals=e.target.checked;save();draw()});
 let SPREAD=[],REVEALED=new Set();
-function draw(){const p=pool();const n=Math.min(S.spreadN,p.length);
+function draw(){const p=pool();const n=Math.min(S.layout==='free'?S.spreadN:layoutDef(S.layout).pos.length,p.length);
   SPREAD=shuffle(p).slice(0,n).map(c=>({id:c.id,rev:S.reversals&&Math.random()<.5}));REVEALED=new Set();renderSpread();}
 function renderSpread(){
   const box=$('#spread');const p=pool();
-  $('#spreadNote').textContent=!p.length?'':(S.spreadN>p.length?'Only '+p.length+' cards in the pool, so the spread is shorter than '+S.spreadN+'.':'');
+  const def=S.layout==='free'?null:layoutDef(S.layout);const want=def?def.pos.length:S.spreadN;
+  $('#cardsGroup').hidden=!!def;
+  $('#spreadNote').textContent=!p.length?'':(want>p.length?'Only '+p.length+' cards in the pool, so the spread is shorter than '+want+'.':'');
+  $('#layoutBox').innerHTML=def&&SPREAD.length===def.pos.length?layoutH(def,SPREAD,{mode:'cards',showEl:S.show.element}):'';
   if(!p.length){box.innerHTML='<div class="empty">No cards match the deck setting. Turn on a group or suit in the deck settings.</div>';return}
   box.innerHTML=SPREAD.map((s,i)=>{const c=BYID[s.id];
     const showEl=S.show.element||REVEALED.has(i+'|element');
     const[a,b]=names(c);const nameShown=S.show.name||REVEALED.has(i+'|name');
-    let h='<article class="tcard '+(showEl?elClass(c):'')+'"><div class="band"></div><div class="tc-body">';
-    h+='<div class="tc-top"><span>Position '+(i+1)+'</span>'+(s.rev?'<span class="rev">Reversed</span>':'')+'</div>';
+    let h='<article class="tcard '+(showEl?elClass(c):'')+'" id="tc-'+i+'"><div class="band"></div><div class="tc-body">';
+    h+='<div class="tc-top"><span>'+(def&&def.pos[i]?(i+1)+' · '+esc(def.pos[i][0]):'Position '+(i+1))+'</span>'+(s.rev?'<span class="rev">Reversed</span>':'')+'</div>';
+    if(def&&def.pos[i])h+='<p class="tc-prompt">'+esc(def.pos[i][1])+'</p>';
     h+=nameShown?'<h3 class="tc-name'+(!S.show.name?' shown-late':'')+'">'+esc(a)+(b?'<span class="tc-alt">RWS: '+esc(b)+'</span>':'')+'</h3>':'<button class="mask big" data-r="'+i+'|name">Reveal name</button>';
     h+='<dl class="facts">';
     FIELDS.forEach(([k])=>{if(k==='name')return;const v=val(c,k);if(v==null)return;const key=i+'|'+k;
@@ -956,6 +1003,7 @@ function renderSpread(){
 }
 $('#spread').addEventListener('click',e=>{const b=e.target.closest('[data-r]');if(!b)return;REVEALED.add(b.dataset.r);renderSpread()});
 $('#draw').addEventListener('click',draw);
+$('#layoutBox').addEventListener('click',e=>{const b=e.target.closest('[data-lpos]');if(!b)return;$('#tc-'+b.dataset.lpos)?.scrollIntoView({behavior:'smooth',block:'center'})});
 $('#revealAll').addEventListener('click',()=>{SPREAD.forEach((s,i)=>FIELDS.forEach(([k])=>REVEALED.add(i+'|'+k)));renderSpread()});
 $('#quizSpread').addEventListener('click',()=>{S.src='spread';if(S.mode==='daily'||S.mode==='speed')S.mode='smart';save();buildSide();showTab('quiz');resetQuiz()});
 
@@ -1649,6 +1697,7 @@ const REL_SHORT={same:'Same element',friendly:'Friendly',neutral:'Neutral',contr
 const VERD_TXT={strengthened:'Strengthened',weakened:'Weakened',mixed:'Mixed',little:'Little affected'};
 const elName=c=>{const e=elemOf(c);return e?deco('element',e):'no element (planetary trump)'};
 function verdict(L,M,R){
+  if(!L&&!R)return null;
   if(!L||!R){const o=L||R;const r=rel(o,M);return{v:r==='contrary'?'weakened':r==='neutral'?'little':'strengthened',why:'Only one neighbour: '+REL_TXT[r]+'.'}}
   const rl=rel(L,M),rr=rel(R,M);
   if(rel(L,R)==='contrary')return{v:'little',why:'The two outer cards are contrary to each other, so they cancel out and the middle card is little affected.'};
@@ -1761,10 +1810,11 @@ let jDelArmed=null;
 function renderJournal(){
   const js=(P.journal||[]).slice().sort((a,b)=>b.t-a.t);
   let h='';
-  if(!js.length)h='<div class="empty">No readings saved yet. Write one in Practice reading and save it to see it here.</div>';
-  else h='<p class="note">'+js.length+' saved reading'+(js.length===1?'':'s')+'. They are part of your progress file, so save one now and then to keep a copy.</p><div class="jlist">'+js.map(j=>'<div class="jentry"><span class="meta">'+new Date(j.t).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})+' · '+j.cards.map(x=>esc(shortName(BYID[x.id]))+(x.rev?' (rev.)':'')).join(' · ')+'</span><div class="txt">'+esc(j.text)+'</div><div class="acts" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-jopen="'+j.id+'">Open</button><button class="btn quiet" data-jdel="'+j.id+'">'+(jDelArmed===j.id?'Tap again to delete':'Delete')+'</button></div></div>').join('')+'</div>';
+  if(!js.length)h='<div class="empty">No readings saved yet. Do a Guided reading or a Quick reading and save it to see it here.</div>';
+  else h='<p class="note">'+js.length+' saved reading'+(js.length===1?'':'s')+'. They are part of your progress file, so save one now and then to keep a copy.</p><div class="jlist">'+js.map(j=>'<div class="jentry"><span class="meta">'+new Date(j.t).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})+(j.kind==='guided'?' · '+esc(j.layout==='free'?'Free draw':layoutDef(j.layout).name):'')+' · '+j.cards.map(x=>esc(shortName(BYID[x.id]))+(x.rev?' (rev.)':'')).join(' · ')+'</span>'+(j.q?'<div class="qtext">'+esc(j.q)+'</div>':'')+'<div class="txt">'+esc(j.text||'')+'</div><div class="acts" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-jopen="'+j.id+'">Open</button><button class="btn quiet" data-jdel="'+j.id+'">'+(jDelArmed===j.id?'Tap again to delete':'Delete')+'</button></div></div>').join('')+'</div>';
   $('#readBody').innerHTML=h;
   $$('[data-jopen]').forEach(b=>b.addEventListener('click',()=>{const j=P.journal.find(x=>x.id===b.dataset.jopen);if(!j)return;
+    if(j.kind==='guided'){openGuided(j);S.readMode='guided';save();renderRead();return}
     SY.cards=j.cards.slice();SY.text=j.text;SY.revealed=true;SY.openId=j.id;SY.source='journal';S.readMode='synthesis';save();renderRead()}));
   $$('[data-jdel]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.jdel;
     if(jDelArmed!==id){jDelArmed=id;renderJournal();setTimeout(()=>{if(jDelArmed===id){jDelArmed=null;if(S.readMode==='journal'&&TAB==='read')renderJournal()}},4000);return}
@@ -1772,13 +1822,242 @@ function renderJournal(){
 }
 function renderRead(){
   $('#rm-'+S.readMode).checked=true;
-  $('#readNote').textContent={dignities:'How neighbouring cards strengthen or weaken each other.',synthesis:'Read a few cards together, then compare with the keywords, meanings and dignities.',journal:'Your saved readings.'}[S.readMode];
-  if(S.readMode==='dignities')renderDignities();else if(S.readMode==='synthesis')renderSynthesis();else renderJournal();
+  $('#readNote').textContent={guided:'A full reading, one step at a time.',synthesis:'Read two or three cards together, then compare.',scan:'Practise the first look: patterns across a whole spread.',positions:'Learn what each position in a spread means.',dignities:'How neighbouring cards strengthen or weaken each other.',journal:'Your saved readings.'}[S.readMode];
+  ({dignities:renderDignities,synthesis:renderSynthesis,scan:renderScan,positions:renderPositions,guided:renderGuided,journal:renderJournal}[S.readMode]||renderGuided)();
 }
 $$('input[name=readmode]').forEach(r=>r.addEventListener('change',e=>{S.readMode=e.target.value;save();renderRead()}));
-$('#readSpread').addEventListener('click',()=>{useSpread();showTab('read')});
+$('#readSpread').addEventListener('click',()=>{GR=blankGR();grFromSpread();S.readMode='guided';save();showTab('read')});
 document.addEventListener('keydown',e=>{if(TAB!=='read'||S.readMode!=='dignities')return;if(e.target.tagName==='INPUT'&&e.target.type!=='radio'&&e.target.type!=='checkbox')return;if(e.target.tagName==='TEXTAREA')return;
   if(/^[1-4]$/.test(e.key)&&!DG.answered)answerDig(+e.key-1);else if(e.key==='Enter'&&DG.answered&&e.target.tagName!=='BUTTON'){e.preventDefault();newDig()}});
+
+/* ---------- spread layouts: common spreads and Waite's Celtic Cross (Pictorial Key, 1910) ---------- */
+const LAYOUTS=[
+ {id:'one',name:'One card',pos:[['Focus','The heart of the matter, or a theme for the day']],xy:[[1,1]],pairs:[]},
+ {id:'ppf',name:'Three cards · Past, Present, Future',pos:[['Past','What has led here'],['Present','Where things stand now'],['Future','Where things are heading']],xy:[[1,1],[2,1],[3,1]],
+  pairs:[[0,2,'Where it began, against where it is heading']]},
+ {id:'sao',name:'Three cards · Situation, Action, Outcome',pos:[['Situation','What is going on'],['Action','What you could do'],['Outcome','What that action is likely to bring']],xy:[[1,1],[2,1],[3,1]],
+  pairs:[[0,1,'Does the action suit the situation?'],[1,2,'How the action leads to the outcome']]},
+ {id:'mbs',name:'Three cards · Mind, Body, Spirit',pos:[['Mind','Thoughts and attitudes'],['Body','Health, work and practical matters'],['Spirit','Inner life and sense of purpose']],xy:[[1,1],[2,1],[3,1]],
+  pairs:[[0,1,'How your thinking shapes your practical life'],[1,2,'How daily life feeds or drains your inner life']]},
+ {id:'cross5',name:'Five-card cross',pos:[['Present','The situation now'],['Past','The influence behind it'],['Future','What is approaching'],['Above','What helps, or what you are aiming for'],['Below','The root of the matter']],
+  xy:[[2,2],[1,2],[3,2],[2,1],[2,3]],nb:[[1,2],[null,0],[0,null],[null,0],[0,null]],
+  pairs:[[1,2,'What is passing, against what is coming'],[3,4,'Your aim, against the root of the matter']]},
+ {id:'elements',name:'Elemental cross',pos:[['Spirit','The core of the matter'],['Fire','Will, energy and action'],['Water','Feelings and relationships'],['Air','Thoughts and communication'],['Earth','Body, money and practical matters']],
+  xy:[[2,2],[2,1],[3,2],[1,2],[2,3]],nb:[[3,2],[null,0],[0,null],[null,0],[0,null]],
+  pairs:[[1,2,'Fire against Water: what you want to do, against what you feel'],[3,4,'Air against Earth: ideas, against practicalities']]},
+ {id:'horseshoe',name:'Horseshoe',pos:[['Past','What has led here'],['Present','Where things stand'],['Hidden influences','What you may not see'],['Obstacles','What stands in the way'],['Others','The people and surroundings involved'],['Advice','The best approach'],['Outcome','The likely result']],
+  xy:[[1,1],[2,2],[3,3],[4,4],[5,3],[6,2],[7,1]],
+  pairs:[[0,6,'Where it began, against where it ends'],[3,5,'The obstacle, against the advice'],[2,4,'What is hidden, against what others bring']]},
+ {id:'celtic',name:'Celtic Cross (Waite)',pos:[['What covers you','The general atmosphere around the question'],['What crosses you','The obstacle or opposing force'],['What crowns you','Your aim; the best that can be achieved'],['What is beneath you','The foundation; what is already yours'],['What is behind you','The influence that is passing away'],['What is before you','The influence that is coming'],['Yourself','Your position and attitude'],['Your house','Your surroundings and the influence of others'],['Hopes and fears','What you hope for, or dread'],['What will come','The outcome']],
+  xy:[[2,2],[2,2],[2,1],[2,3],[1,2],[3,2],[4,4],[4,3],[4,2],[4,1]],cross:1,
+  nb:[[4,5],[0,null],[null,0],[0,null],[null,0],[0,null],[null,7],[6,8],[7,9],[8,null]],
+  pairs:[[0,1,'The situation, and what crosses it'],[2,3,'Your conscious aim, against your foundation'],[4,5,'What is passing, against what is coming'],[6,7,'You, against your surroundings'],[8,9,'Your hopes and fears, against the outcome'],[0,9,'Where it starts, against where it ends']]}];
+const layoutDef=id=>LAYOUTS.find(l=>l.id===id)||LAYOUTS[LAYOUTS.length-1];
+function freeDef(n){return{id:'free',name:'Free draw',pos:Array.from({length:n},(_,i)=>['Position '+(i+1),'']),xy:Array.from({length:n},(_,i)=>[(i%5)+1,Math.floor(i/5)+1]),pairs:n>=3?[[0,n-1,'The first card, against the last']]:[]}}
+function nbOf(def,i,n){if(def.nb)return def.nb[i];return[i>0?i-1:null,i<n-1?i+1:null]}
+function digAt(def,cs,i){const[a,b]=nbOf(def,i,cs.length);return verdict(a!=null?cs[a]:null,cs[i],b!=null?cs[b]:null)}
+function digScore(def,cs,i){const[a,b]=nbOf(def,i,cs.length);const nbs=[a,b].filter(x=>x!=null).map(x=>cs[x]);if(!nbs.length)return 0;
+  if(nbs.length===2&&rel(nbs[0],nbs[1])==='contrary')return 0;
+  return nbs.reduce((t,n)=>t+{same:2,friendly:1,neutral:0,contrary:-2}[rel(n,cs[i])],0)}
+function layoutH(def,cards,o={}){
+  const cols=Math.max(...def.xy.map(p=>p[0])),rows=Math.max(...def.xy.map(p=>p[1]));
+  let h='<div class="layout'+(cols>=5?' dense':'')+'" style="grid-template-columns:repeat('+cols+',minmax(0,1fr))">';
+  def.xy.forEach(([x,y],i)=>{const e=cards&&cards[i];const c=e?BYID[e.id]:null;const cls=['lcell'];
+    if(def.cross===i)cls.push('crossing');if(def.cross!=null&&def.cross-1===i)cls.push('hascross');if(o.hl===i)cls.push('hl');if(o.ok===i)cls.push('ok');if(o.bad===i)cls.push('bad');if(o.showEl&&c)cls.push(elClass(c));
+    const label=o.mode==='cards'&&c?esc(shortName(c))+(e.rev?' (rev.)':''):o.mode==='numbers'?'':esc(def.pos[i][0]);
+    h+='<button type="button" class="'+cls.join(' ')+'" style="grid-column:'+x+';grid-row:'+y+'" data-lpos="'+i+'" aria-label="Position '+(i+1)+(o.mode==='numbers'?'':': '+esc(def.pos[i][0]))+'"><span class="ln">'+(i+1)+(def.cross===i?' · crossing':'')+'</span>'+(label?'<span class="lnm">'+label+'</span>':'')+'</button>'});
+  return h+'</div>';
+}
+{const sel=$('#layoutSel');sel.innerHTML='<option value="free">Free draw</option>'+LAYOUTS.map(l=>'<option value="'+l.id+'">'+esc(l.name)+'</option>').join('');
+ sel.value=S.layout;sel.addEventListener('change',e=>{S.layout=e.target.value;save();draw()});}
+const cardPlanet=c=>c.group==='number'?c.planet:(c.group==='major'&&c.kind==='pl'?c.attr:null);
+const cardSign=c=>c.group==='number'?c.sign:(c.group==='major'&&c.kind==='zo'?c.attr:null);
+const cardNum=c=>(c.group==='number'||c.group==='ace')?c.n:null;
+
+/* ---------- spread scan: graded questions about a whole spread ---------- */
+function numOpts(ans,max){const c=[ans];for(let d=1;c.length<4&&d<=max+3;d++){if(ans+d<=max)c.push(ans+d);if(c.length<4&&ans-d>=0)c.push(ans-d)}return c.sort((a,b)=>a-b)}
+function scanQs(def,cards){
+  const cs=cards.map(x=>BYID[x.id]),n=cs.length,qs=[];if(n<3)return qs;
+  const nmL=c=>esc(shortName(c));
+  const cnt={Fire:0,Water:0,Air:0,Earth:0};cs.forEach(c=>{const e=elemOf(c);if(e)cnt[e]++});
+  const mx=Math.max(...Object.values(cnt)),tops=Object.keys(cnt).filter(e=>cnt[e]===mx);const dom=mx>0&&tops.length===1?tops[0]:'None';
+  const cntH=Object.entries(cnt).map(([e,k])=>deco('element',e)+' '+k).join(', ')+(cs.some(c=>!elemOf(c))?'. Planetary trumps carry no element.':'.');
+  qs.push({prompt:'Which element dominates this spread?',opts:['Fire','Water','Air','Earth','None'].map(o=>({h:o==='None'?'No single element':deco('element',o),ok:o===dom})),why:'Count: '+cntH});
+  if(n>=4){const miss=Object.keys(cnt).filter(e=>!cnt[e]);if(miss.length===1)qs.push({prompt:'Which element is missing from this spread?',opts:['Fire','Water','Air','Earth'].map(o=>({h:deco('element',o),ok:o===miss[0]})),why:'Count: '+cntH+' A missing element can point to what the situation lacks.'})}
+  const maj=cs.filter(c=>c.group==='major');
+  qs.push({prompt:'How many trumps (Major Arcana) are in this spread?',opts:numOpts(maj.length,n).map(k=>({h:String(k),ok:k===maj.length})),why:maj.length?'Trumps: '+maj.map(nmL).join(', ')+'. '+(maj.length/n>=.5?'Half or more: larger forces are at work.':'A minority: everyday matters lead.'):'No trumps: the situation is mostly in everyday hands.'});
+  const crt=cs.filter(c=>c.group==='court');
+  if(crt.length&&n>=4)qs.push({prompt:'How many court cards are in this spread?',opts:numOpts(crt.length,n).map(k=>({h:String(k),ok:k===crt.length})),why:'Court cards: '+crt.map(nmL).join(', ')+'. They often stand for people, roles or attitudes.'});
+  const sc=cs.map((c,i)=>digScore(def,cs,i));const lo=Math.min(...sc),hi=Math.max(...sc);
+  const digWhy=()=>cs.map((c,i)=>{const d=digAt(def,cs,i);return d?nmL(c)+' <span class="tag '+d.v+'">'+VERD_TXT[d.v]+'</span>':''}).filter(Boolean).join('<br>');
+  const cardOpts=(ix)=>{const others=shuffle(cs.map((c,i)=>i).filter(i=>i!==ix)).slice(0,3);return shuffle([ix,...others]).map(i=>({h:(i+1)+'. '+nmL(cs[i]),ok:i===ix}))};
+  if(lo<0&&sc.filter(x=>x===lo).length===1)qs.push({prompt:'Which card is most weakened by its neighbours?',opts:cardOpts(sc.indexOf(lo)),why:digWhy()});
+  if(hi>0&&sc.filter(x=>x===hi).length===1)qs.push({prompt:'Which card is most strengthened by its neighbours?',opts:cardOpts(sc.indexOf(hi)),why:digWhy()});
+  if(n>=4){
+    for(const [lab,f,fmt] of [['a planet',cardPlanet,v=>deco('planet',v)],['a sign',cardSign,v=>deco('sign',v)],['a number',cardNum,v=>v===1?'Ace':String(v)]]){
+      const g={};cs.forEach((c,i)=>{const v=f(c);if(v!=null)(g[v]=g[v]||[]).push(i)});
+      const shared=Object.entries(g).filter(([,a])=>a.length>1);
+      if(shared.length===1&&shared[0][1].length===2){const [a,b]=shared[0][1];
+        const pairs=[];for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){if(!(i===a&&j===b)&&!(f(cs[i])!=null&&f(cs[i])===f(cs[j])))pairs.push([i,j])}
+        const pk=shuffle(pairs).slice(0,3);
+        qs.push({prompt:'Which two cards share '+lab+'?',opts:shuffle([[a,b],...pk]).map(([i,j])=>({h:nmL(cs[i])+' and '+nmL(cs[j]),ok:i===a&&j===b})),why:nmL(cs[a])+' and '+nmL(cs[b])+' share '+fmt(shared[0][0])+'. A shared planet, sign or number ties two positions together.'});
+        break;}
+    }
+  }
+  const first=qs.shift();return[first,...shuffle(qs).slice(0,3)];
+}
+function newScan(def,cards){return{def,cards,qs:scanQs(def,cards),i:0,picks:[],right:0}}
+function scanH(st,o={}){
+  const cs=st.cards.map(x=>BYID[x.id]);const done=st.i>=st.qs.length;
+  let h=layoutH(st.def,st.cards,{mode:'cards',showEl:done});
+  if(!st.qs.length)return h+'<p class="note">This spread is too small for scanning questions. Use three or more cards.</p>';
+  if(!done){const q=st.qs[st.i],pk=st.picks[st.i];
+    h+='<div class="scanq"><span class="q-eyebrow"><span>Question '+(st.i+1)+' of '+st.qs.length+'</span></span><p class="q-prompt">'+q.prompt+'</p>';
+    h+='<div class="opts">'+q.opts.map((op,j)=>'<button class="opt'+(pk!=null?(op.ok?' right':(j===pk?' wrong':'')):'')+'" data-sq="'+j+'"'+(pk!=null?' disabled':'')+'><span class="k">'+(j+1)+'</span><span>'+op.h+'</span></button>').join('')+'</div>';
+    if(pk!=null)h+='<div class="fb '+(q.opts[pk].ok?'ok':'no')+'">'+(q.opts[pk].ok?'Correct.':'Not this time.')+'</div><div class="why">'+q.why+'</div><div class="q-foot"><span></span><div class="acts"><button class="btn primary" id="scanNext">'+(st.i+1<st.qs.length?'Next question':'See the whole picture')+'</button></div></div>';
+    h+='</div>';}
+  else{h+='<div class="scanq"><span class="q-eyebrow"><span>Scan complete · '+st.right+' of '+st.qs.length+' right</span></span><div><span class="lbl">Patterns</span>'+patternsH(cs)+'</div>';
+    h+='<div><span class="lbl">Dignities by position</span><div class="why">'+cs.map((c,i)=>{const d=digAt(st.def,cs,i);return '<div class="relrow"><span>'+(i+1)+'. '+esc(st.def.pos[i][0])+': '+esc(shortName(c))+' ('+elName(c)+')</span>'+(d?'<span class="tag '+d.v+'">'+VERD_TXT[d.v]+'</span>':'<span></span>')+'</div>'}).join('')+'</div></div>'+(o.after||'')+'</div>';}
+  return h;
+}
+function bindScan(st,rerender){
+  $$('[data-sq]').forEach(b=>b.addEventListener('click',()=>{if(st.picks[st.i]!=null)return;const j=+b.dataset.sq;st.picks[st.i]=j;if(st.qs[st.i].opts[j].ok)st.right++;rerender()}));
+  $('#scanNext')?.addEventListener('click',()=>{st.i++;rerender()});
+}
+let SCAN=null;
+function drawScan(){const def=layoutDef(S.scanLayout);const p=pool().length>=def.pos.length?pool():CARDS;SCAN=newScan(def,shuffle(p).slice(0,def.pos.length).map(c=>({id:c.id,rev:false})));renderRead()}
+function renderScan(){
+  if(!SCAN||SCAN.def.id!==S.scanLayout)return drawScan();
+  let h='<div class="modebar"><div class="group"><label class="lbl" for="scanSel">Spread</label><select id="scanSel">'+LAYOUTS.filter(l=>l.pos.length>=3).map(l=>'<option value="'+l.id+'"'+(l.id===S.scanLayout?' selected':'')+'>'+esc(l.name)+'</option>').join('')+'</select></div><button class="btn" id="scanNew">New spread</button></div>';
+  h+='<div class="qcard">'+scanH(SCAN)+'</div>';
+  $('#readBody').innerHTML=h;
+  $('#scanSel').addEventListener('change',e=>{S.scanLayout=e.target.value;save();drawScan()});
+  $('#scanNew').addEventListener('click',drawScan);
+  bindScan(SCAN,renderRead);
+}
+
+/* ---------- positions drill ---------- */
+const PD={q:null,score:0,total:0};
+function newPosQ(){
+  const ls=LAYOUTS.filter(l=>l.pos.length>=5);const def=pick([...ls,...ls.filter(l=>l.id==='celtic'),pick(LAYOUTS.filter(l=>l.pos.length===3))]);
+  const i=Math.floor(Math.random()*def.pos.length);const type=pick(def.pos.length>=5?['name','where','meaning']:['name','meaning']);
+  const others=shuffle(def.pos.map((p,j)=>j).filter(j=>j!==i)).slice(0,3);const ix=shuffle([i,...others]);
+  let q;
+  if(type==='name')q={def,i,type,prompt:'In the '+esc(def.name)+', what is position <strong>'+(i+1)+'</strong>?',opts:ix.map(j=>({h:esc(def.pos[j][0]),ok:j===i})),hl:i};
+  else if(type==='where')q={def,i,type,prompt:'Where does <strong>“'+esc(def.pos[i][0])+'”</strong> go in the '+esc(def.name)+'? Tap its place.',tap:true};
+  else q={def,i,type,prompt:'In the '+esc(def.name)+', which position shows <strong>“'+esc(def.pos[i][1].replace(/\.$/,''))+'”</strong>?',opts:ix.map(j=>({h:esc(def.pos[j][0]),ok:j===i}))};
+  PD.q=q;renderRead();
+}
+function renderPositions(){
+  if(!PD.q)return newPosQ();
+  const q=PD.q;const done=q.picked!=null;
+  let h='<div class="modebar"><span class="score" style="margin:0"><span class="pill"><b>'+PD.score+'/'+PD.total+'</b>right</span></span></div><div class="qcard"><span class="q-eyebrow"><span>Spread positions</span></span><p class="q-prompt">'+q.prompt+'</p>';
+  const lo={mode:done?'positions':'numbers',hl:!done&&q.type==='name'?q.i:null};
+  if(done){lo.ok=q.i;if(q.tap&&q.picked!==q.i)lo.bad=q.picked}
+  h+=layoutH(q.def,null,lo);
+  if(q.opts)h+='<div class="opts">'+q.opts.map((o,j)=>'<button class="opt'+(done?(o.ok?' right':(j===q.picked?' wrong':'')):'')+'" data-pq="'+j+'"'+(done?' disabled':'')+'><span class="k">'+(j+1)+'</span><span>'+o.h+'</span></button>').join('')+'</div>';
+  if(done){const ok=q.tap?q.picked===q.i:q.opts[q.picked].ok;
+    h+='<div class="fb '+(ok?'ok':'no')+'">'+(ok?'Correct.':'Not this time.')+'</div><div class="why"><b>'+(q.i+1)+'. '+esc(q.def.pos[q.i][0])+'</b>: '+esc(q.def.pos[q.i][1])+'.</div><div class="q-foot"><span></span><div class="acts"><button class="btn primary" id="pdNext">Next</button></div></div>';}
+  h+='</div>';
+  $('#readBody').innerHTML=h;
+  $$('[data-pq]').forEach(b=>b.addEventListener('click',()=>answerPos(+b.dataset.pq)));
+  if(q.tap&&!done)$$('#readBody [data-lpos]').forEach(b=>b.addEventListener('click',()=>answerPos(+b.dataset.lpos)));
+  $('#pdNext')?.addEventListener('click',newPosQ);
+}
+function answerPos(j){const q=PD.q;if(!q||q.picked!=null)return;q.picked=j;PD.total++;if(q.tap?j===q.i:q.opts[j].ok)PD.score++;renderRead()}
+
+/* ---------- guided reading ---------- */
+const STEPS=['Question','First look','Patterns','Positions','Relationships','Summary'];
+let GR=null;
+function blankGR(){return{step:0,layout:S.layout!=='free'?S.layout:'celtic',cards:[],q:'',imp:'',pos:{},shown:{},rel:{},relShown:{},sum:'',adv:'',scan:null,openId:null,fromSpread:false}}
+const grDef=()=>GR.layout==='free'?freeDef(GR.cards.length):layoutDef(GR.layout);
+function grDraw(){const def=GR.layout==='free'?null:layoutDef(GR.layout);const n=def?def.pos.length:5;const p=pool().length>=n?pool():CARDS;
+  GR.cards=shuffle(p).slice(0,n).map(c=>({id:c.id,rev:S.reversals&&Math.random()<.5}));GR.scan=null;GR.pos={};GR.shown={};GR.rel={};GR.relShown={};GR.fromSpread=false;}
+function sharedH(a,b){const out=[];
+  if(a.suit&&a.suit===b.suit)out.push('same suit ('+suitLabel(a.suit)+')');
+  const na=cardNum(a),nb2=cardNum(b);if(na&&na===nb2)out.push('same number ('+(na===1?'Ace':na)+', '+SEPH[na]+')');
+  const pa=cardPlanet(a);if(pa&&pa===cardPlanet(b))out.push('same planet ('+deco('planet',pa)+')');
+  const sa=cardSign(a);if(sa&&sa===cardSign(b))out.push('same sign ('+deco('sign',sa)+')');
+  if(a.group==='court'&&b.group==='court'&&a.rank.t===b.rank.t)out.push('both '+a.rank.t+'s');
+  if(a.group==='major'&&b.group==='major')out.push('both trumps');
+  return out;}
+function meaningH(c,rev,d){return '<span class="lbl">Thoth keywords</span><div>'+esc(kwOf(c)||'–')+'</div><span class="lbl">'+(rev?'RWS reversed (Waite)':'RWS meaning (Waite)')+'</span><div>'+esc(RWSM[c.id][rev?1:0])+'</div>'+(d?'<div><span class="tag '+d.v+'">'+VERD_TXT[d.v]+'</span> <span class="hint">'+d.why+'</span></div>':'')}
+function renderGuided(){
+  if(!GR)GR=blankGR();
+  const def=GR.cards.length?grDef():null;const cs=GR.cards.map(x=>BYID[x.id]);
+  let h='<div class="steps">'+STEPS.map((t,i)=>'<button data-step="'+i+'" class="'+(i===GR.step?'on':i<GR.step?'done':'')+'"'+(i>0&&!GR.cards.length?' disabled':'')+'>'+(i+1)+'. '+t+'</button>').join('')+'</div><div class="qcard">';
+  const nav=(back,next,nextLbl)=>'<div class="q-foot"><span>'+(back?'<button class="btn" id="grBack">Back</button>':'')+'</span><div class="acts">'+(next?'<button class="btn primary" id="grNext">'+(nextLbl||'Next')+'</button>':'')+'</div></div>';
+  if(GR.step===0){
+    h+='<span class="q-eyebrow"><span>Step 1 · Your question</span></span><p class="note" style="margin:0">Readers usually settle the question before touching the cards. Keep it open (“What do I need to understand about…”) rather than yes-or-no.</p>';
+    h+='<label class="lbl" for="grQ">Question</label><textarea class="reading sm" id="grQ" placeholder="What would you like to understand?">'+esc(GR.q)+'</textarea>';
+    h+='<div class="group"><label class="lbl" for="grLayout">Spread</label><select id="grLayout">'+LAYOUTS.map(l=>'<option value="'+l.id+'"'+(l.id===GR.layout?' selected':'')+'>'+esc(l.name)+'</option>').join('')+(GR.layout==='free'?'<option value="free" selected>Free draw (from the Spread tab)</option>':'')+'</select></div>';
+    if(GR.cards.length)h+='<p class="hint" style="margin:0">'+(GR.fromSpread?'Using the cards from your Spread tab.':'Cards drawn.')+' Drawing again replaces them.</p>';
+    h+='<div class="q-foot"><span><button class="btn" id="grFromSpread">Use the cards on the Spread tab</button></span><div class="acts"><button class="btn'+(GR.cards.length?'':' primary')+'" id="grDraw">'+(GR.cards.length?'Draw again':'Draw the cards')+'</button>'+(GR.cards.length?'<button class="btn primary" id="grNext">Next</button>':'')+'</div></div>';
+  }else if(GR.step===1){
+    h+='<span class="q-eyebrow"><span>Step 2 · First look</span></span>'+(GR.q?'<p class="qtext" style="margin:0">'+esc(GR.q)+'</p>':'');
+    h+=layoutH(def,GR.cards,{mode:'cards'});
+    h+='<p class="note" style="margin:0">Before any meanings: what strikes you? Which card draws your eye, what mood does the spread have, what story do the titles suggest?</p><textarea class="reading sm" id="grImp" placeholder="First impressions">'+esc(GR.imp)+'</textarea>'+nav(true,true);
+  }else if(GR.step===2){
+    if(!GR.scan)GR.scan=newScan(def,GR.cards);
+    h+='<span class="q-eyebrow"><span>Step 3 · Patterns</span></span><p class="note" style="margin:0">Scan the whole spread before reading card by card.</p>'+scanH(GR.scan)+nav(true,GR.scan.i>=GR.scan.qs.length||!GR.scan.qs.length,'Next');
+  }else if(GR.step===3){
+    h+='<span class="q-eyebrow"><span>Step 4 · Positions</span></span><p class="note" style="margin:0">Read each card in its position. Write your reading first, then check it against the keywords, Waite’s meaning and the card’s dignity.</p>';
+    h+=layoutH(def,GR.cards,{mode:'cards',showEl:true});
+    h+=cs.map((c,i)=>{const r=GR.cards[i].rev;const d=digAt(def,cs,i);
+      return '<div class="gblock"><span class="posname">'+(i+1)+' · '+esc(def.pos[i][0])+(def.pos[i][1]?' — '+esc(def.pos[i][1]):'')+'</span><h4>'+esc(shortName(c))+(r?' <span class="rev" style="font-size:.7rem">Reversed</span>':'')+'</h4>'+
+        '<textarea class="reading sm" data-gpos="'+i+'" placeholder="What does this card say in this position?">'+esc(GR.pos[i]||'')+'</textarea>'+
+        (GR.shown[i]?'<div class="why">'+meaningH(c,r,d)+'</div>':'<div><button class="btn quiet" data-gshow="'+i+'">Show meanings</button></div>')+'</div>'}).join('');
+    h+=nav(true,true);
+  }else if(GR.step===4){
+    h+='<span class="q-eyebrow"><span>Step 5 · Relationships</span></span><p class="note" style="margin:0">Spreads are built to be read in pairs. Compare these positions and say what the pairing tells you.</p>';
+    const pairs=def.pairs.length?def.pairs:[];
+    if(!pairs.length)h+='<p class="note">A single card has no pairs. Move on to the summary.</p>';
+    h+=pairs.map(([a,b,pr],k)=>{const A=cs[a],Bc=cs[b];const r=rel(A,Bc);const sh=sharedH(A,Bc);
+      return '<div class="gblock"><span class="posname">'+(a+1)+' and '+(b+1)+' · '+esc(pr)+'</span><h4>'+esc(shortName(A))+' <span class="hint">and</span> '+esc(shortName(Bc))+'</h4>'+
+        '<textarea class="reading sm" data-grel="'+k+'" placeholder="How do these two speak to each other?">'+esc(GR.rel[k]||'')+'</textarea>'+
+        (GR.relShown[k]?'<div class="why"><div class="relrow"><span>'+esc(shortName(A))+' ('+elName(A)+') with '+esc(shortName(Bc))+' ('+elName(Bc)+')</span><span class="tag '+r+'">'+REL_SHORT[r]+'</span></div>'+(sh.length?'<p style="margin:6px 0 0">They share: '+sh.join('; ')+'.</p>':'<p style="margin:6px 0 0">No shared number, suit, planet or sign.</p>')+'<p style="margin:6px 0 0"><span class="lbl">'+esc(def.pos[a][0])+'</span>'+esc(kwOf(A)||'')+'</p><p style="margin:6px 0 0"><span class="lbl">'+esc(def.pos[b][0])+'</span>'+esc(kwOf(Bc)||'')+'</p></div>':'<div><button class="btn quiet" data-grshow="'+k+'">Show the connection</button></div>')+'</div>'}).join('');
+    h+=nav(true,true);
+  }else{
+    h+='<span class="q-eyebrow"><span>Step 6 · Summary</span></span>'+(GR.q?'<p class="qtext" style="margin:0">'+esc(GR.q)+'</p>':'');
+    h+=layoutH(def,GR.cards,{mode:'cards',showEl:true});
+    h+='<label class="lbl" for="grSum">The answer in a sentence or two</label><textarea class="reading sm" id="grSum" placeholder="Pull it together">'+esc(GR.sum)+'</textarea>';
+    h+='<label class="lbl" for="grAdv">Advice</label><textarea class="reading sm" id="grAdv" placeholder="What would you advise?">'+esc(GR.adv)+'</textarea>';
+    h+='<div class="q-foot"><span><button class="btn" id="grBack">Back</button></span><span class="fb" id="grMsg"></span><div class="acts"><button class="btn" id="grNew">New reading</button><button class="btn primary" id="grSave">'+(GR.openId?'Update journal entry':'Save to journal')+'</button></div></div>';
+  }
+  h+='</div>';
+  $('#readBody').innerHTML=h;
+  const go=st=>{GR.step=st;renderRead();window.scrollTo({top:$('#tab-read').offsetTop-60,behavior:'smooth'})};
+  $$('[data-step]').forEach(b=>b.addEventListener('click',()=>{if(+b.dataset.step>0&&!GR.cards.length)return;go(+b.dataset.step)}));
+  $('#grBack')?.addEventListener('click',()=>go(GR.step-1));
+  $('#grNext')?.addEventListener('click',()=>go(GR.step+1));
+  $('#grQ')?.addEventListener('input',e=>GR.q=e.target.value);
+  $('#grImp')?.addEventListener('input',e=>GR.imp=e.target.value);
+  $('#grSum')?.addEventListener('input',e=>GR.sum=e.target.value);
+  $('#grAdv')?.addEventListener('input',e=>GR.adv=e.target.value);
+  $('#grLayout')?.addEventListener('change',e=>{GR.layout=e.target.value;GR.cards=[];GR.scan=null;renderRead()});
+  $('#grDraw')?.addEventListener('click',()=>{grDraw();go(1)});
+  $('#grFromSpread')?.addEventListener('click',()=>{grFromSpread();renderRead()});
+  $$('[data-gpos]').forEach(t=>t.addEventListener('input',e=>GR.pos[t.dataset.gpos]=e.target.value));
+  $$('[data-grel]').forEach(t=>t.addEventListener('input',e=>GR.rel[t.dataset.grel]=e.target.value));
+  $$('[data-gshow]').forEach(b=>b.addEventListener('click',()=>{GR.shown[b.dataset.gshow]=true;renderRead()}));
+  $$('[data-grshow]').forEach(b=>b.addEventListener('click',()=>{GR.relShown[b.dataset.grshow]=true;renderRead()}));
+  if(GR.step===2&&GR.scan)bindScan(GR.scan,renderRead);
+  $('#grNew')?.addEventListener('click',()=>{const lay=GR.layout==='free'?'celtic':GR.layout;GR=blankGR();GR.layout=lay;renderRead()});
+  $('#grSave')?.addEventListener('click',saveGuided);
+}
+function grFromSpread(){if(!SPREAD.length)draw();GR=GR||blankGR();GR.layout=S.layout;GR.cards=SPREAD.map(x=>({id:x.id,rev:x.rev}));GR.scan=null;GR.pos={};GR.shown={};GR.rel={};GR.relShown={};GR.fromSpread=true;GR.openId=null}
+function saveGuided(){
+  const msg=$('#grMsg');const any=[GR.q,GR.imp,GR.sum,GR.adv,...Object.values(GR.pos),...Object.values(GR.rel)].some(x=>x&&x.trim());
+  if(!any){msg.className='fb no';msg.textContent='Write something first.';return}
+  P.journal=P.journal||[];
+  const data={kind:'guided',layout:GR.layout,cards:GR.cards.slice(),q:GR.q,imp:GR.imp,pos:Object.assign({},GR.pos),rel:Object.assign({},GR.rel),sum:GR.sum,adv:GR.adv,text:GR.sum||GR.imp||''};
+  if(GR.openId){const j=P.journal.find(x=>x.id===GR.openId);if(j){Object.assign(j,data);j.edited=Date.now()}}
+  else{const id='j'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);P.journal.unshift(Object.assign({id,t:Date.now()},data));GR.openId=id}
+  saveP();msg.className='fb ok';msg.textContent='Saved to your journal.';$('#grSave').textContent='Update journal entry';
+}
+function openGuided(j){GR=blankGR();Object.assign(GR,{layout:j.layout,cards:j.cards.slice(),q:j.q||'',imp:j.imp||'',pos:Object.assign({},j.pos||{}),rel:Object.assign({},j.rel||{}),sum:j.sum||'',adv:j.adv||'',openId:j.id,step:5});
+  j.cards.forEach((_,i)=>GR.shown[i]=true);(layoutDef(j.layout).pairs||[]).forEach((_,k)=>GR.relShown[k]=true);
+  if(j.layout==='free')freeDef(j.cards.length).pairs.forEach((_,k)=>GR.relShown[k]=true);}
 
 /* ---------- phone: settings start folded ---------- */
 const mq=window.matchMedia('(max-width:860px)');

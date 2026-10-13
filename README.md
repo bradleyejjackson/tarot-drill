@@ -13,6 +13,7 @@ It runs entirely in your browser. There's nothing to sign up for, it installs to
 ## Features
 
 ### Spread
+- Choose a named spread: one card; three-card Past · Present · Future, Situation · Action · Outcome, or Mind · Body · Spirit; a five-card cross; an elemental cross; the Horseshoe; or the Celtic Cross as given in Waite's *Pictorial Key*. Cards are laid out in the spread's shape, with each position's name and meaning.
 - Draw 1, 3, 4, 5, 7 or 10 (Celtic Cross) cards, or any number up to 22, with optional reversals.
 - Choose what each card shows: name, number, suit, element, planet, sign, Thoth title, Hebrew letter, Sephirah, decan dates, esoteric title, or the other deck's name.
 - Hidden fields can be tapped to reveal, so you can test yourself on a spread.
@@ -28,8 +29,11 @@ It runs entirely in your browser. There's nothing to sign up for, it installs to
 - Every answer is followed by a short explanation that places the card in the system.
 
 ### Read
+- **Guided reading:** a full reading in six steps: your question, a first look, a scan of the patterns, each card in its position, the key pairs of positions, and a summary with advice. At each step you write your own reading first, then check it against the keywords, Waite's meanings and the dignities. Save it to your journal and reopen it later.
+- **Spread scan:** graded questions about a whole spread (which element dominates or is missing, how many trumps and courts, which card is most strengthened or weakened, which cards share a planet, sign or number) to train the first look.
+- **Positions:** learn what each position in a spread means, including tapping its place in the layout.
 - **Elemental dignities:** practise how neighbouring cards strengthen or weaken each other, in pairs or in rows of three, using the modern Thoth rules (Fire–Air and Water–Earth friendly, Fire–Water and Air–Earth contrary, Fire–Earth and Air–Water neutral). Each answer shows the relationship between every pair of cards.
-- **Practice reading:** draw two or three cards (or use your last spread), write your own reading, then reveal each card's Thoth keywords, Waite's RWS meaning (reversed when the card is), its dignity, and the patterns in the spread: dominant element, trumps, courts, repeated numbers, shared planets and signs.
+- **Quick reading:** draw two or three cards (or use your last spread), write your own reading, then reveal each card's Thoth keywords, Waite's RWS meaning (reversed when the card is), its dignity, and the patterns in the spread: dominant element, trumps, courts, repeated numbers, shared planets and signs.
 - **Journal:** save your readings and reopen them later.
 
 ### Meanings

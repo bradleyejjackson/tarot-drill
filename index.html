@@ -228,6 +228,10 @@ textarea.reading{width:100%;min-height:120px;resize:vertical;background:var(--bg
 .cardread h4{font-family:var(--f-display);font-weight:400;font-size:1.1rem;margin:0;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
 .cardread .lbl{display:block;margin-top:4px}
 .patlist{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.grade{background:var(--sunk);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.gscore{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.gband{font-family:var(--f-display);font-size:1.1rem}
+.glist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}.glist li{display:flex;gap:10px;font-size:.9rem;line-height:1.45}.glist .gi{flex:0 0 1.3em;font-weight:700;text-align:center}.glist .ok .gi{color:var(--ok)}.glist .part .gi{color:var(--gilt)}.glist .miss .gi{color:var(--bad)}.gnote{color:var(--muted)}
+.jscore{font-family:var(--f-mono);font-size:.8rem;color:var(--gilt);margin-left:6px}
 .jentry{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
 .jentry .meta{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
 .jentry .txt{white-space:pre-wrap;font-size:.95rem}
@@ -422,8 +426,7 @@ table.ref td.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums;wh
   .tile{padding:10px;font-size:.88rem}
 }
 </style>
-</head>
-<body>
+
 <div class="wrap">
 <header class="top">
   <div>
@@ -1833,8 +1836,8 @@ function answerDig(i){if(DG.answered)return;const cs=DG.cards,pair=S.digMode==='
   DG.answered=true;DG.picked=i;DG.total++;if(opts[i]===correct)DG.score++;renderRead();}
 
 /* practice reading */
-const SY={cards:[],text:'',revealed:false,source:'draw',openId:null};
-function drawSy(){SY.cards=shuffle(pool().length>=S.synN?pool():CARDS).slice(0,S.synN).map(c=>({id:c.id,rev:S.reversals&&Math.random()<.5}));SY.text='';SY.revealed=false;SY.source='draw';SY.openId=null;renderRead()}
+const SY={cards:[],text:'',revealed:false,source:'draw',openId:null,grade:null};
+function drawSy(){SY.cards=shuffle(pool().length>=S.synN?pool():CARDS).slice(0,S.synN).map(c=>({id:c.id,rev:S.reversals&&Math.random()<.5}));SY.text='';SY.revealed=false;SY.source='draw';SY.openId=null;SY.grade=null;renderRead()}
 function lineDignity(cs,i){return verdict(cs[i-1]||null,cs[i],cs[i+1]||null)}
 function patternsH(cs){
   const out=[];const els={};cs.forEach(c=>{const e=elemOf(c)||'Spirit';els[e]=(els[e]||0)+1});
@@ -1865,6 +1868,7 @@ function renderSynthesis(){
         '<span class="lbl">'+(r?'RWS reversed (Waite)':'RWS meaning (Waite)')+'</span><div>'+esc(RWSM[c.id][r?1:0])+'</div>'+
         (d?'<span class="hint">'+d.why+'</span>':'')+'</div>'}).join('')+'</div>';
     h+='<div><span class="lbl">Patterns</span>'+patternsH(cs)+'</div>';
+    h+=SY.grade?gradeH(SY.grade):'<div><button class="btn" id="syGrade">Grade my reading</button></div>';
     h+='<div class="q-foot"><span class="fb" id="syMsg"></span><div class="acts">'+(SY.openId?'<button class="btn" id="syNew">New reading</button><button class="btn primary" id="sySave">Update journal entry</button>':'<button class="btn" id="syNew">New reading</button><button class="btn primary" id="sySave">Save to journal</button>')+'</div></div>';
   }
   h+='</div>';
@@ -1872,17 +1876,20 @@ function renderSynthesis(){
   $$('input[name=synN]').forEach(r=>r.addEventListener('change',e=>{S.synN=+e.target.value;save();drawSy()}));
   $('#syDraw').addEventListener('click',drawSy);
   $('#sySpread').addEventListener('click',useSpread);
-  $('#syText').addEventListener('input',e=>{SY.text=e.target.value});
+  $('#syText').addEventListener('input',e=>{SY.text=e.target.value;SY.grade=null});
   $('#syReveal')?.addEventListener('click',()=>{SY.revealed=true;renderRead()});
+  $('#syGrade')?.addEventListener('click',()=>{SY.grade=gradeReading(gradeCtxQuick());renderRead()});
   $('#syNew')?.addEventListener('click',drawSy);
   $('#sySave')?.addEventListener('click',saveJournal);
 }
-function useSpread(){if(!SPREAD.length)draw();SY.cards=SPREAD.map(x=>({id:x.id,rev:x.rev}));SY.text='';SY.revealed=false;SY.source='spread';SY.openId=null;S.readMode='synthesis';save();renderRead()}
+function useSpread(){if(!SPREAD.length)draw();SY.cards=SPREAD.map(x=>({id:x.id,rev:x.rev}));SY.text='';SY.revealed=false;SY.source='spread';SY.openId=null;SY.grade=null;S.readMode='synthesis';save();renderRead()}
 function saveJournal(){
   const msg=$('#syMsg');if(!SY.text.trim()){msg.className='fb no';msg.textContent='Write your reading first.';return}
   P.journal=P.journal||[];
-  if(SY.openId){const j=P.journal.find(x=>x.id===SY.openId);if(j){j.text=SY.text;j.edited=Date.now()}}
-  else{const id='j'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);P.journal.unshift({id,t:Date.now(),cards:SY.cards.slice(),text:SY.text});SY.openId=id}
+  SY.grade=gradeReading(gradeCtxQuick());const gr={score:SY.grade.score,band:SY.grade.band,t:SY.grade.t};
+  if(SY.openId){const j=P.journal.find(x=>x.id===SY.openId);if(j){j.text=SY.text;j.grade=gr;j.edited=Date.now()}}
+  else{const id='j'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);P.journal.unshift({id,t:Date.now(),cards:SY.cards.slice(),text:SY.text,grade:gr});SY.openId=id}
+  renderRead();
   saveP();msg.className='fb ok';msg.textContent='Saved to your journal.';
   $('#sySave').textContent='Update journal entry';
 }
@@ -1891,12 +1898,13 @@ function renderJournal(){
   const js=(P.journal||[]).slice().sort((a,b)=>b.t-a.t);
   let h='';
   if(!js.length)h='<div class="empty">No readings saved yet. Do a Guided reading or a Quick reading and save it to see it here.</div>';
-  else h='<div class="modebar"><p class="note" style="margin:0">'+js.length+' saved reading'+(js.length===1?'':'s')+'. They are part of your progress file; you can also export them as a readable document.</p><button class="btn" id="jExport">Export journal (.md)</button><span class="fb" id="jMsg"></span></div><div class="jlist">'+js.map(j=>'<div class="jentry"><span class="meta">'+new Date(j.t).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})+(j.kind==='guided'?' · '+esc(j.layout==='free'?'Free draw':layoutDef(j.layout).name):'')+' · '+j.cards.map(x=>esc(shortName(BYID[x.id]))+(x.rev?' (rev.)':'')).join(' · ')+'</span>'+(j.q?'<div class="qtext">'+esc(j.q)+'</div>':'')+'<div class="txt">'+esc(j.text||'')+'</div><div class="acts" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-jopen="'+j.id+'">Open</button><button class="btn quiet" data-jdel="'+j.id+'">'+(jDelArmed===j.id?'Tap again to delete':'Delete')+'</button></div></div>').join('')+'</div>';
+  else{const gs=js.filter(j=>j.grade).slice(0,5);const avg=gs.length?Math.round(gs.reduce((t,j)=>t+j.grade.score,0)/gs.length):null;
+   h='<div class="modebar"><p class="note" style="margin:0">'+js.length+' saved reading'+(js.length===1?'':'s')+'. They are part of your progress file; you can also export them as a readable document.'+(avg!=null?' Structure score, last '+gs.length+': <b>'+avg+'</b> average.':'')+'</p><button class="btn" id="jExport">Export journal (.md)</button><span class="fb" id="jMsg"></span></div><div class="jlist">'+js.map(j=>'<div class="jentry"><span class="meta">'+new Date(j.t).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'})+(j.kind==='guided'?' · '+esc(j.layout==='free'?'Free draw':layoutDef(j.layout).name):'')+' · '+j.cards.map(x=>esc(shortName(BYID[x.id]))+(x.rev?' (rev.)':'')).join(' · ')+(j.grade?'<span class="jscore">'+j.grade.score+'/100 · '+esc(j.grade.band)+'</span>':'')+'</span>'+(j.q?'<div class="qtext">'+esc(j.q)+'</div>':'')+'<div class="txt">'+esc(j.text||'')+'</div><div class="acts" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-jopen="'+j.id+'">Open</button><button class="btn quiet" data-jdel="'+j.id+'">'+(jDelArmed===j.id?'Tap again to delete':'Delete')+'</button></div></div>').join('')+'</div>';}
   $('#readBody').innerHTML=h;
   $('#jExport')?.addEventListener('click',exportJournal);
   $$('[data-jopen]').forEach(b=>b.addEventListener('click',()=>{const j=P.journal.find(x=>x.id===b.dataset.jopen);if(!j)return;
     if(j.kind==='guided'){openGuided(j);S.readMode='guided';save();renderRead();return}
-    SY.cards=j.cards.slice();SY.text=j.text;SY.revealed=true;SY.openId=j.id;SY.source='journal';S.readMode='synthesis';save();renderRead()}));
+    SY.cards=j.cards.slice();SY.text=j.text;SY.revealed=true;SY.openId=j.id;SY.source='journal';SY.grade=null;S.readMode='synthesis';save();renderRead()}));
   $$('[data-jdel]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.jdel;
     if(jDelArmed!==id){jDelArmed=id;renderJournal();setTimeout(()=>{if(jDelArmed===id){jDelArmed=null;if(S.readMode==='journal'&&TAB==='read')renderJournal()}},4000);return}
     jDelArmed=null;P.journal=P.journal.filter(x=>x.id!==id);P.jdel=[...(P.jdel||[]),id];saveP();renderJournal()}));
@@ -2050,7 +2058,7 @@ function answerPos(j){const q=PD.q;if(!q||q.picked!=null)return;q.picked=j;PD.to
 /* ---------- guided reading ---------- */
 const STEPS=['Question','First look','Patterns','Positions','Relationships','Summary'];
 let GR=null;
-function blankGR(){return{step:0,layout:S.layout!=='free'?S.layout:'celtic',cards:[],q:'',imp:'',pos:{},shown:{},rel:{},relShown:{},sum:'',adv:'',scan:null,openId:null,fromSpread:false}}
+function blankGR(){return{step:0,layout:S.layout!=='free'?S.layout:'celtic',cards:[],q:'',imp:'',pos:{},shown:{},rel:{},relShown:{},sum:'',adv:'',scan:null,openId:null,fromSpread:false,grade:null}}
 const grDef=()=>GR.layout==='free'?freeDef(GR.cards.length):layoutDef(GR.layout);
 function grDraw(){const def=GR.layout==='free'?null:layoutDef(GR.layout);const n=def?def.pos.length:5;const p=pool().length>=n?pool():CARDS;
   GR.cards=shuffle(p).slice(0,n).map(c=>({id:c.id,rev:S.reversals&&Math.random()<.5}));GR.scan=null;GR.pos={};GR.shown={};GR.rel={};GR.relShown={};GR.fromSpread=false;}
@@ -2103,6 +2111,7 @@ function renderGuided(){
     h+=layoutH(def,GR.cards,{mode:'cards',showEl:true});
     h+='<label class="lbl" for="grSum">The answer in a sentence or two</label><textarea class="reading sm" id="grSum" placeholder="Pull it together">'+esc(GR.sum)+'</textarea>';
     h+='<label class="lbl" for="grAdv">Advice</label><textarea class="reading sm" id="grAdv" placeholder="What would you advise?">'+esc(GR.adv)+'</textarea>';
+    h+=GR.grade?gradeH(GR.grade):'<div><button class="btn" id="grGrade">Grade this reading</button> <span class="hint">Checks the whole reading, all six steps, against the spread.</span></div>';
     h+='<div class="q-foot"><span><button class="btn" id="grBack">Back</button></span><span class="fb" id="grMsg"></span><div class="acts"><button class="btn" id="grNew">New reading</button><button class="btn primary" id="grSave">'+(GR.openId?'Update journal entry':'Save to journal')+'</button></div></div>';
   }
   h+='</div>';
@@ -2125,21 +2134,127 @@ function renderGuided(){
   if(GR.step===2&&GR.scan)bindScan(GR.scan,renderRead);
   $('#grNew')?.addEventListener('click',()=>{const lay=GR.layout==='free'?'celtic':GR.layout;GR=blankGR();GR.layout=lay;renderRead()});
   $('#grSave')?.addEventListener('click',saveGuided);
+  $('#grGrade')?.addEventListener('click',()=>{GR.grade=gradeReading(gradeCtxGuided());renderRead()});
+  $$('#grQ,#grImp,#grSum,#grAdv,[data-gpos],[data-grel]').forEach(t=>t.addEventListener('input',()=>{GR.grade=null}));
 }
 function grFromSpread(){if(!SPREAD.length)draw();GR=GR||blankGR();GR.layout=S.layout;GR.cards=SPREAD.map(x=>({id:x.id,rev:x.rev}));GR.scan=null;GR.pos={};GR.shown={};GR.rel={};GR.relShown={};GR.fromSpread=true;GR.openId=null}
 function saveGuided(){
   const msg=$('#grMsg');const any=[GR.q,GR.imp,GR.sum,GR.adv,...Object.values(GR.pos),...Object.values(GR.rel)].some(x=>x&&x.trim());
   if(!any){msg.className='fb no';msg.textContent='Write something first.';return}
   P.journal=P.journal||[];
-  const data={kind:'guided',layout:GR.layout,cards:GR.cards.slice(),q:GR.q,imp:GR.imp,pos:Object.assign({},GR.pos),rel:Object.assign({},GR.rel),sum:GR.sum,adv:GR.adv,text:GR.sum||GR.imp||''};
+  GR.grade=gradeReading(gradeCtxGuided());
+  const data={kind:'guided',layout:GR.layout,cards:GR.cards.slice(),q:GR.q,imp:GR.imp,pos:Object.assign({},GR.pos),rel:Object.assign({},GR.rel),sum:GR.sum,adv:GR.adv,text:GR.sum||GR.imp||'',grade:{score:GR.grade.score,band:GR.grade.band,t:GR.grade.t}};
   if(GR.openId){const j=P.journal.find(x=>x.id===GR.openId);if(j){Object.assign(j,data);j.edited=Date.now()}}
   else{const id='j'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);P.journal.unshift(Object.assign({id,t:Date.now()},data));GR.openId=id}
-  saveP();msg.className='fb ok';msg.textContent='Saved to your journal.';$('#grSave').textContent='Update journal entry';
+  saveP();renderRead();const m2=$('#grMsg');m2.className='fb ok';m2.textContent='Saved to your journal.';$('#grSave').textContent='Update journal entry';
 }
 function openGuided(j){GR=blankGR();Object.assign(GR,{layout:j.layout,cards:j.cards.slice(),q:j.q||'',imp:j.imp||'',pos:Object.assign({},j.pos||{}),rel:Object.assign({},j.rel||{}),sum:j.sum||'',adv:j.adv||'',openId:j.id,step:5});
   j.cards.forEach((_,i)=>GR.shown[i]=true);(layoutDef(j.layout).pairs||[]).forEach((_,k)=>GR.relShown[k]=true);
   if(j.layout==='free')freeDef(j.cards.length).pairs.forEach((_,k)=>GR.relShown[k]=true);}
 
+
+/* ---------- Reading grader: structural checks against the spread ---------- */
+const GSTOP=new Set('the a an and or of in on to is are was were be been it its this that with for as at by from but so not no into than then there their they you your i my me we our he she his her him them what which who how about more very just also can could would should will may might do does did have has had if when where card cards reading spread position'.split(' '));
+const gnorm=s=>' '+String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[’']/g,'').replace(/[^a-z0-9]+/g,' ')+' ';
+const gstem=w=>w.length>4?w.replace(/(ations?|ness|ment|ing|ed|es|ly|ity|ful|ous|ive)$/,'').replace(/(.)\1$/,'$1'):w;
+const gwords=s=>gnorm(s).split(' ').filter(w=>w.length>2&&!GSTOP.has(w));
+const gstems=s=>new Set(gwords(s).map(gstem));
+const gcount=s=>gnorm(s).trim().split(' ').filter(Boolean).length;
+const ghas=(t,phrase)=>{const p=gnorm(phrase).trim();return p.length>1&&new RegExp('(^| )'+p.replace(/ /g,' +')+'( |$)').test(t.trim())};
+const ganyRe=(t,words)=>words.some(w=>new RegExp('(^| )'+w).test(t));
+const SUIT_ALIAS={wands:['wands','wand','rods','rod','staves','staff','batons'],cups:['cups','cup','chalices'],swords:['swords','sword','blades'],disks:['disks','disk','pentacles','pentacle','coins','coin']};
+function cardAliases(c){const a=[];
+  if(c.group==='major'){[c.tName,c.rName].forEach(n=>{a.push(n);a.push(n.replace(/^the /i,''))})}
+  else{const ranks=c.group==='court'?[c.rank.t,c.rank.r]:c.group==='ace'?['ace','1','one']:[WORD[c.n],String(c.n)];
+    ranks.forEach(r=>SUIT_ALIAS[c.suit].forEach(s=>{a.push(r+' of '+s);a.push(r+' '+s)}));
+    if(c.title)a.push(c.title);if(c.esoteric)a.push(c.esoteric.replace(/^lord of (the )?/i,''))}
+  return[...new Set(a.map(x=>gnorm(x).trim()).filter(x=>x.length>2))]}
+const mentioned=(t,c)=>cardAliases(c).some(p=>ghas(t,p));
+const ELW={Fire:['fire','fiery','wands','wand'],Water:['water','watery','cups','cup'],Air:['air','airy','swords','sword'],Earth:['earth','earthy','disks','disk','pentacles','pentacle']};
+const STRONG_W=['strengthen','strong','support','reinforc','amplif','boost','empower','heighten','intensif','bolster','backed','encourag','helped','feeds','fuel'];
+const WEAK_W=['weaken','weak','undermin','diminish','soften','dampen','blunt','drain','contrar','clash','conflict','tension','odds','frustrat','hamper','mute','lessen','held back','resist','struggl'];
+const MIXED_W=['mixed','pull','both ways','torn','tension','on one hand','ambival'];
+const TRUMP_W=['trump','major','arcana','larger','bigger','fate','beyond','out of your hands','out of my hands','archetyp','deep','karmic','turning point'];
+const PEOPLE_W=['person','people','someone','somebody','figure','role','character','attitude','he ','she ','they ','a man','a woman','part of you','side of you','yourself'];
+const REV_W=['revers','invert','upside','block','delay','inward','withheld','stuck','turned','held up','resist','internal'];
+const CONNECT_W=['because','since','while','but','yet','leads','lead','therefore','means','which','so that','so the','so you','and so','then','as a result','once','until','if ','unless','however','although','though','instead','rather'];
+const ADVICE_W=['try','consider','should','could','avoid','focus','keep','let','take','make','start','stop','wait','ask','talk','hold','give','be ','do ','dont','don t','rather','better','best','need','needs','may want','might want','worth','remember','allow','notice','lean','step','trust','rest','act','move','pause','prepar','accept','set '];
+function gradeReading(ctx){
+  // ctx: {def, cards:[{id,rev}], q, imp, pos:{}, rel:{}, sum, adv, text, kind:'guided'|'quick'}
+  const def=ctx.def,cs=ctx.cards.map(x=>BYID[x.id]),n=cs.length,guided=ctx.kind==='guided';
+  const posT=Object.values(ctx.pos||{}).join(' '),relT=Object.values(ctx.rel||{}).join(' ');
+  const allRaw=guided?[ctx.imp,posT,relT,ctx.sum,ctx.adv].join(' '):(ctx.text||'');
+  const all=gnorm(allRaw),allStems=gstems(allRaw);
+  const checks=[];const add=(k,label,w,r,note)=>checks.push({k,label,w,r:Math.max(0,Math.min(1,r)),note});
+  // 1 every card named
+  const named=cs.map(c=>mentioned(all,c));const nm=named.filter(Boolean).length;
+  add('named','Every card is named',2,nm/n,nm===n?'All '+n+' cards are referred to by name.':'Not mentioned: '+cs.filter((c,i)=>!named[i]).map(shortName).join(', ')+'.');
+  // 2 meanings engaged
+  const eng=cs.map(c=>{const kw=gstems(kwOf(c)||'');let hit=[...kw].some(w=>allStems.has(w));if(!hit){const rw=gstems(RWSM[c.id][0]+' '+RWSM[c.id][1]);const big=[...rw].filter(w=>w.length>5);hit=big.filter(w=>allStems.has(w)).length>=2}return hit});
+  const en=eng.filter(Boolean).length;
+  add('meaning','Each card’s meaning is used',4,en/n,en===n?'Every card’s keywords or Waite’s meaning echo in your reading.':'No echo of the keywords for: '+cs.filter((c,i)=>!eng[i]).map(shortName).join(', ')+'. Did you read the card, or just name it?');
+  // 3 dignities
+  const dgs=cs.map((c,i)=>guided?digAt(def,cs,i):(n>1?lineDignity(cs,i):null)).filter(Boolean);
+  const hasS=dgs.some(d=>d.v==='strengthened'),hasW=dgs.some(d=>d.v==='weakened'),hasM=dgs.some(d=>d.v==='mixed');
+  if(hasS||hasW||hasM){let want=0,got=0,miss=[];
+    if(hasS){want++;if(ganyRe(all,STRONG_W))got++;else miss.push('a strengthened card')}
+    if(hasW){want++;if(ganyRe(all,WEAK_W))got++;else miss.push('a weakened card')}
+    if(hasM){want++;if(ganyRe(all,MIXED_W))got++;else miss.push('a card pulled both ways')}
+    add('dignity','Dignities shape the reading',3,got/want,got===want?'You speak of cards strengthening or weakening each other where the elements say they do.':'The spread has '+miss.join(' and ')+', but the reading never says so. Which cards sit beside which?');}
+  else add('dignity','Dignities shape the reading',1,ganyRe(all,STRONG_W.concat(WEAK_W,MIXED_W,['neutral','little effect','no strong']))?1:0.6,'No card is markedly strengthened or weakened here; noting that is enough.');
+  // 4 elemental pattern
+  const els={};cs.forEach(c=>{const e=elemOf(c);if(e)els[e]=(els[e]||0)+1});const top=Object.entries(els).sort((a,b)=>b[1]-a[1]);
+  const dom=top.length&&(top.length===1||top[0][1]>top[1][1])&&top[0][1]>=2?top[0][0]:null;
+  const missing=n>=4?['Fire','Water','Air','Earth'].filter(e=>!els[e]):[];
+  if(dom||missing.length){let want=0,got=0,notes=[];
+    if(dom){want++;if(ganyRe(all,ELW[dom])||ganyRe(all,['dominat','mostly','heavy','weighted','full of','lot of']))got++;else notes.push(dom+' dominates ('+top[0][1]+' of '+n+') and goes unmentioned')}
+    if(missing.length){want++;if(missing.some(e=>ganyRe(all,ELW[e]))||ganyRe(all,['missing','absent','lack','no ','without']))got++;else notes.push('no '+missing.join(' or ')+' in the spread, and the gap is not noted')}
+    add('elements','The elemental balance is read',2,got/want,got===want?'You read the balance of elements across the spread.':notes.join('; ')+'.');}
+  // 5 trumps and courts
+  const maj=cs.filter(c=>c.group==='major').length,crt=cs.filter(c=>c.group==='court').length;
+  if(maj>=2&&maj/n>=.5)add('trumps','The weight of trumps is noted',1,ganyRe(all,TRUMP_W)?1:0,ganyRe(all,TRUMP_W)?'You note that larger forces are at work.':maj+' of '+n+' cards are trumps. That usually means the matter is bigger than the sitter’s choices; say so.');
+  if(crt)add('courts','Court cards are read as people or stances',1,ganyRe(all,PEOPLE_W)?1:0,ganyRe(all,PEOPLE_W)?'Court cards are read as people, roles or attitudes.':'There '+(crt===1?'is a court card':'are '+crt+' court cards')+' but nobody is mentioned. Who, or what stance, do they stand for?');
+  // 6 repeats
+  const by=f=>{const m={};cs.forEach(c=>{const v=f(c);if(v)(m[v]=m[v]||[]).push(c)});return Object.entries(m).filter(([,a])=>a.length>1)};
+  const reps=[...by(c=>cardNum(c)?'n'+cardNum(c):null).map(([k,a])=>({t:(k==='n1'?'Aces':WORD[+k.slice(1)]+'s'),w:[WORD[+k.slice(1)].toLowerCase(),k.slice(1),SEPH[+k.slice(1)].toLowerCase()],a})),...by(cardPlanet).map(([k,a])=>({t:k,w:[k.toLowerCase()],a})),...by(cardSign).map(([k,a])=>({t:k,w:[k.toLowerCase()],a}))];
+  if(reps.length){const got=reps.filter(r=>ganyRe(all,r.w)||ganyRe(all,['repeat','twice','pair of','two of the','both of','again'])).length;
+    add('repeats','Repeated numbers, planets or signs are noticed',1,got/reps.length,got===reps.length?'You picked up the repeats.':'Unremarked: '+reps.filter(r=>!(ganyRe(all,r.w)||ganyRe(all,['repeat','twice','pair of','two of the','both of','again']))).map(r=>r.t+' ('+r.a.map(shortName).join(', ')+')').join('; ')+'.');}
+  // 7 reversals
+  if(ctx.cards.some(x=>x.rev))add('reversed','Reversed cards are treated as reversed',1,ganyRe(all,REV_W)?1:0,ganyRe(all,REV_W)?'Reversals are acknowledged.':'Some cards are reversed but the reading never says how that changes them.');
+  if(guided){
+    // 8 positions
+    const pw=cs.map((_,i)=>gcount((ctx.pos||{})[i]));const pf=pw.filter(w=>w>=8).length;
+    add('positions','Every position gets a real sentence',2,pf/n,pf===n?'Each position has at least a sentence.':(n-pf)+' position'+(n-pf===1?' has':'s have')+' fewer than eight words: '+cs.map((c,i)=>pw[i]<8?(i+1)+' ('+def.pos[i][0]+')':null).filter(Boolean).join(', ')+'.');
+    // 8b position fit: position name words in its own text
+    const fit=cs.map((_,i)=>{const t=gnorm((ctx.pos||{})[i]);const pn=gwords(def.pos[i][0]+' '+(def.pos[i][1]||''));return pn.length?pn.some(w=>t.includes(' '+gstem(w)))||t.length>60:true});const ff=fit.filter(Boolean).length;
+    if(def.id!=='free')add('posfit','Cards are read in their positions',1,ff/n,ff===n?'Each card is read for what its position asks.':'Position not referred to for: '+cs.map((c,i)=>fit[i]?null:(i+1)+' ('+def.pos[i][0]+')').filter(Boolean).join(', ')+'.');
+    // 9 relationships
+    const pairs=def.pairs||[];if(pairs.length){const rf=pairs.filter((_,k)=>gcount((ctx.rel||{})[k])>=6).length;
+      add('pairs','The key pairs are compared',2,rf/pairs.length,rf===pairs.length?'All '+pairs.length+' pairings are discussed.':(pairs.length-rf)+' of '+pairs.length+' pairings left blank or under six words.');}
+    // 10 question answered
+    const qw=gwords(ctx.q||'');if(qw.length){const sa=gstems((ctx.sum||'')+' '+(ctx.adv||''));const hit=qw.map(gstem).filter(w=>sa.has(w)).length;
+      add('question','The summary answers the question',2,gcount(ctx.sum)>=12&&hit?1:gcount(ctx.sum)>=12||hit?.5:0,hit&&gcount(ctx.sum)>=12?'The summary speaks to the words of the question.':!hit?'The summary never uses the question’s own terms ('+qw.slice(0,4).join(', ')+'). Bring it back to what was asked.':'The summary is too short to answer the question.');}
+    else add('question','A question was set',1,0,'No question was written. A reading without a question has nothing to answer.');
+    // 11 synthesis
+    const sw=gcount(ctx.sum),sc=ganyRe(gnorm(ctx.sum),CONNECT_W);
+    add('synth','The summary joins the cards into one story',3,sw>=25&&sc?1:sw>=12&&sc?.7:sw>=12?.4:0,sw>=25&&sc?'The summary links the cards with reasons and consequences.':sw<12?'The summary is '+sw+' words. Aim for a few sentences that tie the cards together.':!sc?'The summary states things but does not connect them (no because, so, while, but, leads to…).':'Some connection; it could go further.');
+    // 12 advice
+    const aw=gcount(ctx.adv),ac=ganyRe(gnorm(ctx.adv),ADVICE_W);
+    add('advice','The advice is something the sitter can do',2,aw>=8&&ac?1:aw>=4?.5:0,aw>=8&&ac?'The advice is concrete.':aw<4?'No advice written.':'The advice is vague; give the sitter one thing to do, try or watch for.');
+  }else{
+    const tw=gcount(ctx.text),tc=ganyRe(all,CONNECT_W);
+    add('synth','The cards are read together, not listed',3,tw>=40&&tc?1:tw>=20&&tc?.7:tw>=20?.4:0,tw>=40&&tc?'The reading connects the cards into one account.':tw<20?'Only '+tw+' words. Say how the cards speak to each other.':!tc?'The cards are described but not connected (no because, so, while, but, leads to…).':'Some connection; it could go further.');
+  }
+  const W=checks.reduce((t,c)=>t+c.w,0),got=checks.reduce((t,c)=>t+c.w*c.r,0);
+  const score=Math.round(100*got/W);
+  return{score,band:score>=90?'Thorough':score>=75?'Solid':score>=50?'Developing':'Thin',checks,t:Date.now()};
+}
+function gradeH(g){
+  return '<div class="grade"><div class="gscore"><span class="pill hot"><b>'+g.score+'</b>/ 100</span><span class="gband">'+g.band+'</span><span class="hint">Structure only: this checks that the reading engages with what is in the spread, not whether the interpretation is wise.</span></div><ul class="glist">'+
+    g.checks.map(c=>'<li class="'+(c.r>=.99?'ok':c.r>0?'part':'miss')+'"><span class="gi">'+(c.r>=.99?'✓':c.r>0?'◐':'✗')+'</span><span><b>'+esc(c.label)+'</b><br><span class="gnote">'+esc(c.note)+'</span></span></li>').join('')+'</ul></div>';
+}
+function gradeCtxGuided(){return{kind:'guided',def:grDef(),cards:GR.cards,q:GR.q,imp:GR.imp,pos:GR.pos,rel:GR.rel,sum:GR.sum,adv:GR.adv}}
+function gradeCtxQuick(){return{kind:'quick',def:null,cards:SY.cards,text:SY.text}}
 
 /* ---------- journal export: a readable Markdown document ---------- */
 function journalMd(){
@@ -2152,6 +2267,7 @@ function journalMd(){
     const def=j.kind==='guided'?(j.layout==='free'?freeDef(j.cards.length):layoutDef(j.layout)):null;
     md+='\n---\n\n## '+fmtD(j.t)+(def?' · '+def.name:' · Quick reading')+'\n\n';
     if(q(j.q))md+='**Question:** '+q(j.q)+'\n\n';
+    if(j.grade)md+='**Structure score:** '+j.grade.score+'/100 ('+j.grade.band+')\n\n';
     md+='**Cards**\n\n'+j.cards.map((x,i)=>(i+1)+'. '+(def&&def.pos[i]?def.pos[i][0]+': ':'')+nm(x)).join('\n')+'\n\n';
     if(j.kind==='guided'){
       if(q(j.imp))md+='**First look:** '+q(j.imp)+'\n\n';

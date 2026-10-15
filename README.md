@@ -40,6 +40,7 @@ It runs entirely in your browser, with Pamela Colman Smith's original 1909 Rider
 - **Positions:** learn what each position in a spread means, including tapping its place in the layout.
 - **Elemental dignities:** practise how neighbouring cards strengthen or weaken each other, in pairs or in rows of three, using the modern Thoth rules (Fire–Air and Water–Earth friendly, Fire–Water and Air–Earth contrary, Fire–Earth and Air–Water neutral). Each answer shows the relationship between every pair of cards.
 - **Quick reading:** draw two or three cards (or use your last spread), write your own reading, then reveal each card's Thoth keywords, Waite's RWS meaning (reversed when the card is), its dignity, and the patterns in the spread: dominant element, trumps, courts, repeated numbers, shared planets and signs.
+- **Reading grader:** after a guided or quick reading, **Grade this reading** checks its structure against the spread: every card named and its meaning used, dignities respected where cards strengthen or weaken each other, the elemental balance and any repeats noticed, court cards read as people, reversals acknowledged, every position and key pair written up, the summary tied to the question and joined into one story, and the advice something the sitter can do. Each check says what it found or missed. It grades structure, not wisdom. Scores are saved with the journal entry.
 - **Journal:** save your readings, reopen them later, and export the whole journal as a readable Markdown document.
 
 ### Meanings
